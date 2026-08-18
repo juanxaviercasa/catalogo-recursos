@@ -1,0 +1,74 @@
+- [ ] Abrir el enlace compartido de Drive y confirmar que permite lectura.
+- [ ] Recorrer la carpeta y las subcarpetas, registrando nombres y rutas.
+- [ ] Convertir el inventario verificado a los datos que consumirá el sitio.
+- [ ] Crear y verificar la interfaz de exploración y búsqueda.
+- [x] Definir categorías, etiquetas y campos de ficha para el catálogo marketplace.
+- [x] Clasificar los 50 recursos por tipo visual y casos de uso recomendados.
+- [x] Incorporar filtros de etiqueta y fichas detalladas de recurso en el sitio.
+- [x] Verificar la búsqueda, la clasificación y la navegación de fichas en escritorio y móvil.
+- [x] Inventariar las carpetas y subcarpetas de Diseño Grafico, excluyendo PAQUETE DE REELS MOTIVACIONALES CON IA.
+- [x] Clasificar los recursos encontrados con categorías, etiquetas y usos recomendados.
+- [x] Integrar la nueva estructura de carpetas y fichas en el catálogo.
+- [x] Verificar el inventario ampliado y la exclusión solicitada.
+- [x] Inventariar la estructura, subcarpetas y recursos de la nueva carpeta compartida.
+- [x] Crear categorías, etiquetas y fichas de uso para sus recursos.
+- [x] Integrar la colección en los filtros y rutas del catálogo.
+- [x] Verificar la nueva colección en escritorio y móvil.
+- [x] Definir los campos de caso de uso, problema resuelto y resultado esperado.
+- [x] Enriquecer las fichas por familia de recurso con lenguaje orientado a proyectos.
+- [x] Mostrar los nuevos campos en tarjetas y paneles de detalle.
+- [x] Verificar la claridad de las fichas mejoradas en escritorio y móvil.
+- [x] Definir la estructura de título claro, subtítulo original y escenario ideal.
+- [x] Redactar títulos y tres ejemplos precisos de uso por familia de recurso.
+- [x] Integrar títulos, subtítulos y escenarios en tarjetas y fichas de detalle.
+- [x] Verificar la comprensión de las fichas renovadas en escritorio y móvil.
+- [x] Definir objetivos de proyecto para filtrar los recursos de forma directa.
+- [x] Implementar filtros por objetivo y almacenar favoritos localmente.
+- [x] Crear una vista comparativa con diferencias de uso, casos y etiquetas.
+- [x] Verificar filtros, comparación y persistencia de favoritos en escritorio y móvil.
+- [x] Diseñar el flujo de exportación, colecciones compartibles, recomendaciones y filtros plegables.
+- [x] Implementar exportación de comparativas y colecciones persistentes con enlace compartible.
+- [x] Añadir recomendaciones automáticas y el menú plegable de filtros.
+- [x] Optimizar y verificar los nuevos flujos en móvil, tableta y escritorio.
+- [x] Convertir el panel lateral en menú desplegable bajo demanda en todos los tamaños.
+- [x] Ampliar la tipografía, reforzar pesos y elevar el contraste de navegación y registros.
+- [x] Intensificar la paleta y la jerarquía visual sin perder legibilidad documental.
+- [x] Verificar la experiencia rediseñada en escritorio, tableta y móvil.
+- [x] Definir campos de CMS, aplicación, sistema operativo y requisitos técnicos.
+- [x] Clasificar compatibilidad técnica a partir de carpetas y nombres de recurso.
+- [x] Mostrar compatibilidad y filtros técnicos en fichas y comparativas.
+- [x] Verificar que cada recomendación indique claramente dónde puede utilizarse.
+- [x] Definir una cuadrícula de tarjetas compacta para el catálogo tipo marketplace.
+- [x] Adaptar la información de cada ficha al formato de dos y tres columnas.
+- [x] Verificar la lectura de tarjetas en escritorio, tableta y móvil.
+- [x] Corregir el icono del control de filtros que genera desborde visual.
+- [x] Añadir acciones de descarga directa para los archivos individuales de Drive.
+- [x] Diferenciar claramente la acción disponible para colecciones o carpetas de Drive.
+- [x] Verificar el comportamiento en escritorio y móvil.
+- [x] Retirar fechas de modificación de tarjetas y fichas detalladas.
+- [x] Definir rangos de tamaño y el modelo persistente del carrito de descargas.
+- [x] Añadir controles para incorporar o quitar recursos del carrito.
+- [x] Implementar filtro de catálogo por tamaño de archivo.
+- [x] Crear descarga por lote con estado de progreso y resumen de selección.
+- [x] Verificar el carrito y la descarga en bloque en escritorio y móvil.
+- [x] Reducir la altura de la muestra visual secundaria dentro de cada ficha.
+- [x] Reforzar título, descripción, compatibilidad y caso ideal como información visible.
+- [x] Separar las tarjetas con color, borde y ritmo de cuadrícula perceptibles.
+- [x] Verificar que las fichas no se perciban vacías en escritorio y móvil.
+- [x] Definir la fuente privada cofredelemprendedor@gmail.com y su enlace raíz de Drive.
+- [x] Sustituir nombres y mapas de carpetas visibles por la fuente y un acceso directo.
+- [x] Preparar la interfaz para añadir futuras cuentas como fuentes de Drive.
+- [x] Verificar que no se expongan jerarquías internas y que el enlace siga siendo accesible.
+- [x] Inventariar archivos y subcarpetas reales dentro de las colecciones de Drive.
+- [x] Modelar colecciones expandibles con elementos descargables individualmente.
+- [x] Añadir selección de elementos y descarga completa de cada colección.
+- [x] Verificar exploración y descargas en escritorio y móvil.
+- [x] Definir miniaturas verificables de Drive con representación clara para archivos sin vista previa.
+- [x] Añadir filtros internos por formato y tamaño dentro de cada colección.
+- [x] Implementar guardado, carga y eliminación de selecciones parciales.
+- [x] Verificar miniaturas, filtros y listas guardadas en escritorio y móvil.
+- [x] Definir etiquetas manuales persistentes por archivo y selección parcial.
+- [x] Añadir ordenación interna por nombre, tamaño y formato.
+- [x] Implementar vista previa interna al pasar el cursor cuando Drive la permita.
+- [x] Verificar los nuevos controles en escritorio y móvil.
+- [ ] Exportar la versión final al repositorio de GitHub conectado.
