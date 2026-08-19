@@ -71,4 +71,10 @@
 - [x] Añadir ordenación interna por nombre, tamaño y formato.
 - [x] Implementar vista previa interna al pasar el cursor cuando Drive la permita.
 - [x] Verificar los nuevos controles en escritorio y móvil.
-- [ ] Exportar la versión final al repositorio de GitHub conectado.
+- [x] Exportar la versión final al repositorio de GitHub conectado.
+- [x] Inventariar los archivos y subcarpetas reales de la nueva carpeta compartida.
+- [x] Registrar materialesrecursos52@gmail.com y su carpeta raíz como segunda fuente privada.
+- [x] Clasificar cada recurso con ficha editorial, etiquetas y compatibilidad técnica.
+- [x] Integrar la nueva fuente y sus colecciones en filtros, explorador y descargas.
+- [x] Unificar los recursos nuevos con el catálogo existente sin crear una vista separada.
+- [x] Verificar la nueva fuente en escritorio y móvil.

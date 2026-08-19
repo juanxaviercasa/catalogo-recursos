@@ -16,6 +16,7 @@ type SavedPartialSelection = { id: string; name: string; collectionId: string; i
 const inventoryUrls = [
   "/manus-storage/indice-drive-collections-inventory_b44bfba5.json",
   "/manus-storage/indice-drive-design-collection-items_b829eb3f.json",
+  "/manus-storage/plantillas-web-1-25-inventory_9bd1377a.json",
 ];
 const directDownloadUrl = (id: string) => `https://drive.usercontent.google.com/download?id=${id}&export=download&confirm=t`;
 const collectionUrl = (id: string) => `https://drive.google.com/drive/folders/${id}`;

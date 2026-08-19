@@ -3,6 +3,7 @@
  */
 import { catalog, type CatalogItem } from "@/data/catalog";
 import { individualPackages } from "@/data/designPackages";
+import { plantillasWebCatalog } from "@/data/plantillasWebCatalog";
 import { webCatalog } from "@/data/webCatalog";
 
 type Row = [id: string, name: string, sourceFolder: string, category: CatalogItem["category"], type: string, tags: string[], purpose: string, projects: string[], color: string, collection?: boolean];
@@ -84,6 +85,6 @@ export const characterPackages: CatalogItem[] = characterRows.map(([id, name]) =
   modified: "20 oct 2024",
 }));
 
-export const fullCatalog: CatalogItem[] = [...catalog.map((item) => ({ ...item, sourceFolder: "Patrones Graficos" })), ...designCatalog, ...characterPackages, ...individualPackages, ...webCatalog];
+export const fullCatalog: CatalogItem[] = [...catalog.map((item) => ({ ...item, sourceFolder: "Patrones Graficos" })), ...designCatalog, ...characterPackages, ...individualPackages, ...webCatalog, ...plantillasWebCatalog];
 
 export const sourceFolders = ["Diseño Grafico", "Patrones Graficos", "3D BUILDER", "capcut pro", "iconos", "musicas", "photoshop", "Diseño Web"];

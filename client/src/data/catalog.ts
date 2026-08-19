@@ -25,6 +25,7 @@ export type CatalogItem = Omit<ArchiveItem, "category"> & {
   projects: string[];
   color: string;
   sourceFolder?: string;
+  sourceId?: string;
   isCollection?: boolean;
 };
 

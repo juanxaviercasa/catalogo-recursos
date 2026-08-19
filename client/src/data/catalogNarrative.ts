@@ -180,6 +180,7 @@ const titleOverrides: Record<string, string> = {
   Joomla: "Sitio corporativo administrable sin depender del equipo técnico",
   OpenCart: "Tienda online para vender un catálogo de productos",
   "Plantillas Word": "Documentos profesionales para presentar y vender ideas",
+  "Plantillas Web 1–25 · Código y sitios comerciales": "Biblioteca web para lanzar productos, servicios y sitios con código",
   "Plugins · WordPress, WooCommerce y Elementor": "Funciones extra para convertir WordPress en una herramienta comercial",
   "Shopify 11–21": "Tienda Shopify de marca lista para lanzar productos",
   "Shopify Premium": "Tienda premium para una marca que quiere vender con confianza",
@@ -206,7 +207,17 @@ export const technicalFilters = [
 export function technicalFor(item: CatalogItem): TechnicalCompatibility {
   const name = item.name.toLowerCase();
   const source = (item.sourceFolder ?? "Patrones Graficos").toLowerCase();
+  const signals = `${name} ${item.tags.join(" ").toLowerCase()}`;
   const web = (apps: string[], environment: string, code: string, requirement: string, filterKeys: string[], caution?: string): TechnicalCompatibility => ({ apps, environment, code, requirement, filterKeys, caution });
+
+  if (source === "plantillas web") return web(
+    ["HTML/CSS/JavaScript", "React", "Next.js", "Vue/Nuxt", "PHP/Laravel", "CodeIgniter", "Tailwind CSS", "Elementor"],
+    "Windows, macOS o Linux con editor de código; hosting o entorno local según la plantilla elegida",
+    "Requiere editar HTML, CSS y JavaScript para las plantillas estáticas; React, Next.js, Vue, Nuxt, PHP, Laravel o CodeIgniter cuando el ZIP lo indique.",
+    "Abrir cada ZIP y revisar el README, package.json o archivos de instalación para confirmar framework, versión de Node.js/PHP y dependencias antes de iniciar el proyecto.",
+    ["design-tools"],
+    "La colección reúne tecnologías diferentes: no todas las plantillas sirven para el mismo framework, CMS o hosting. Revisa el nombre y los archivos internos de cada recurso antes de instalarlo."
+  );
 
   if (source === "diseño web") {
     if (/plugins/.test(name)) return web(["WordPress", "WooCommerce", "Elementor"], "Navegador + hosting WordPress compatible", "No requiere código para instalar y configurar lo básico; PHP, CSS y JavaScript solo para personalizaciones avanzadas.", "Necesitas un sitio WordPress activo; las extensiones de tienda requieren WooCommerce y las de diseño visual requieren Elementor cuando el plugin lo indique.", ["wordpress", "woocommerce"], "No todos los plugins sirven para cualquier versión de WordPress: revisa compatibilidad, licencia y requisitos de cada ZIP antes de instalarlos.");

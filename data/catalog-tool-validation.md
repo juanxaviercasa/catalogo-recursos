@@ -31,3 +31,9 @@
 - **Fuente privada:** la interfaz muestra `cofredelemprendedor@gmail.com` como único origen, conserva el enlace directo a la carpeta fuente y no contiene referencias visibles a nombres ni jerarquías internas de carpetas.
 - **Acceso de fuente:** los cuatro accesos de la interfaz apuntan a `1-Ji4Gevs5bv7CjkQ34uKm1pi6DYlf0KL`; la cuenta se muestra correctamente y no se detectaron nombres internos de carpetas en el contenido visible.
 - **Fuente en móvil:** a 375 px, `cofredelemprendedor@gmail.com` se muestra completo, sin desplazamiento lateral; el enlace de la tarjeta de fuente conserva la URL de la carpeta exacta.
+- **Plantillas Web 1–25:** se incorporó la colección de `materialesrecursos52@gmail.com` al catálogo común. La ficha muestra su origen correcto y el explorador carga los 46 archivos reales con descargas individuales y controles internos.
+- **Nueva fuente responsive:** la tarjeta de Plantillas Web 1–25 se identificó correctamente por `materialesrecursos52@gmail.com` dentro del catálogo unificado. En escritorio, su explorador abrió 46 archivos reales; a 375 px la ficha de la nueva fuente no generó desplazamiento horizontal.
+
+## Exportación de código
+
+La versión con etiquetas manuales, ordenación y vista previa se exportó al repositorio `juanxaviercasa/catalogo-recursos` en la rama `main`, mediante el commit `f360ace` (`feat: enrich collection explorer controls`).

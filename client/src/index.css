@@ -1,4 +1,4 @@
-/* Archivo editorial: marfil, tinta y oliva de archivo; las fichas se organizan en una cuadrícula compacta, con carrito persistente, descargas directas y sin fechas que distraigan la decisión. */
+/* Archivo editorial: registro por fuentes, marfil, tinta y oliva de archivo; la cuadrícula es evidencia secundaria y los folios guían la exploración. */
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -278,6 +278,35 @@ button:not(:disabled), a[href] { cursor: pointer; }
 
 @media (max-width:1160px) { .resource-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:700px) { .resource-grid { gap:14px; grid-template-columns:1fr; }.resource-card { border-width:2px; border-top-width:6px; }.resource-content { padding:17px 18px 15px; }.resource-title { font-size:28px !important; }.resource-preview { flex-basis:42px; height:42px !important; min-height:42px !important; } }
+
+/* Registro por fuentes: cada cuenta abre un capítulo; el verde oliva organiza y los colores de acento quedan reservados a estados. */
+.records-by-folder { border-left:7px solid #61765B; padding-left:22px; }
+.folder-register { background:#fffdf7; border-left:0; margin-bottom:72px; padding:0 18px 18px; }
+.folder-register::before { background:#f3c85c; border-color:#61765B; box-shadow:0 0 0 6px rgba(97,118,91,.14); left:-34px; top:22px; }
+.folder-register-heading { background:linear-gradient(90deg,#e8efe5 0%,#fffdf7 76%); border-bottom:6px double #184b39; margin:0 -18px 8px; min-height:128px; padding:27px 18px 18px; }
+.folder-register-heading > span { border-left:4px solid #61765B; color:#506950; padding-left:9px; top:18px; }
+.folder-register-heading::after { background:#f3c85c; color:#173b2e; content:"FOLIO DE ARCHIVO"; right:18px; top:18px; }
+.folder-register-heading h3 { color:#173b2e; font-size:clamp(42px,4.5vw,61px); max-width:76%; }
+.folder-register-heading b { color:#61765B; }
+.resource-grid { gap:0; grid-template-columns:repeat(3,minmax(0,1fr)); }
+.resource-card,.resource-card--flora,.resource-card--geometry,.resource-card--material,.resource-card--atmosphere,.resource-card--retro,.resource-card--ember,.resource-card--cosmos { --record-accent:#61765B; --record-pale:#edf3e9; background:#fffdf7; border:0; border-bottom:1px solid #afc0aa; border-right:1px solid #afc0aa; border-top:0; border-radius:0; box-shadow:none !important; }
+.resource-card:hover { background:#f4f7f1; box-shadow:none !important; transform:none; }
+.record-strip { background:#edf3e9; border-bottom:1px solid #b7c8b2; }
+.record-strip b { background:#184b39; color:#fffdf7; }
+.resource-title { color:#1c3428; font-size:clamp(22px,1.8vw,28px) !important; }
+.resource-type,.resource-original span,.resource-file-meta span:first-child::before,.resource-more { color:#61765B; }
+.technical-teaser,.scenario-teaser { background:#f0f5ed; border-left-color:#61765B; }
+.resource-tags span { background:transparent; border-color:#c4d0bf; color:#4f6b50; }
+.resource-download { background:#184b39; border-color:#184b39; }
+.resource-download:hover { background:#61765B; border-color:#61765B; }
+.resource-preview { background:#e9f0e6; border-left:0; border-top:1px solid #b7c8b2; flex-basis:38px; height:38px !important; min-height:38px !important; }
+.resource-preview .preview-shape { opacity:.12; }
+.preview-label { background:#61765B; }
+.category-card > svg:first-child,.category-symbol { color:#61765B !important; }
+.category-card--active { background:#edf3e9; border-color:#61765B; box-shadow:none; transform:none; }
+
+@media (max-width:1160px) { .resource-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:700px) { .records-by-folder { border-left-width:5px; padding-left:14px; }.folder-register { margin-bottom:48px; padding:0 10px 12px; }.folder-register::before { left:-27px; }.folder-register-heading { margin:0 -10px 5px; min-height:94px; padding:20px 10px 13px; }.folder-register-heading::after { right:10px; top:12px; }.folder-register-heading > span { top:12px; }.folder-register-heading h3 { font-size:34px; }.resource-grid { grid-template-columns:1fr; }.resource-card { border-right:0; }.resource-preview { flex-basis:36px; height:36px !important; min-height:36px !important; } }
 
 /* Fuente privada: se identifica la cuenta y su acceso directo, sin revelar la jerarquía interna del Drive. */
 .source-private-list { display:grid; gap:7px; padding:0 9px 18px; }.source-private-list a { align-items:center; background:#eef3eb; border-left:4px solid #61765b; color:#23442f; display:grid; gap:8px; grid-template-columns:auto 1fr auto; padding:10px; text-decoration:none; }.source-private-list a > svg:first-child { color:#61765b; }.source-private-list span { display:grid; gap:2px; min-width:0; }.source-private-list small { color:#657662; font-size:8px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }.source-private-list b { font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }.source-private-list a:hover { background:#dfeadc; }

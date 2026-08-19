@@ -94,3 +94,6 @@ Un símbolo sin texto compuesto por tres pestañas superpuestas, donde la pesta�
 - La espina oliva `#61765B` une ruta activa, apertura de carpeta y grupo de registros; no se utiliza como un adorno genérico.
 - Amarillo señala un folio, un estado activo o una decisión; coral se reserva para alertas y excepciones, mientras las acciones de uso normal mantienen la tinta o el oliva.
 - Cada apertura de carpeta crea una pausa editorial visible: encabezado de capítulo, ruta, total y registros planos con divisores de imprenta.
+- Las fuentes de Drive abren capítulos de registro independientes; la cuadrícula sólo facilita comparar recursos dentro de cada capítulo y no sustituye la lectura documental.
+- La espina de oliva `#61765B` une portada, controles, capítulos y registros. El amarillo queda para folios y decisiones activas; el coral se limita a avisos y excepciones.
+- El monograma de tres pestañas aparece de forma visible en la portada y en la línea de identidad, como señal de marca integrada al sistema de archivo.
