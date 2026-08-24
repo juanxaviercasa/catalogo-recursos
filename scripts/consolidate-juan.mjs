@@ -13,7 +13,7 @@ const fromRows = (file, id, name) => {
   const entries = rows.map((row) => {
     const text = row.text ?? row.name ?? "";
     const size = text.match(/(\d+(?:[.,]\d+)?\s*(?:Ko|Mo|Go|KB|MB|GB))/i)?.[1] ?? row.size ?? "";
-    const cleanName = (text.split(/\s+(?:Partagé|Shared|Archive compressée)\b/i)[0] || text).replace(/^Compressed archive/i, "").trim();
+    const cleanName = (text.split(/(?:\s|\u00a0)+(?:Partagé|Shared|Archive compressée)/i)[0] || text).replace(/^Compressed archive/i, "").trim();
     return { id: row.id, kind: row.kind ?? "file", name: cleanName, size };
   }).filter((entry) => entry.id && entry.id !== "_gd" && entry.name);
   return { id, name, entries };

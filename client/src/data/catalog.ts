@@ -27,6 +27,7 @@ export type CatalogItem = Omit<ArchiveItem, "category"> & {
   sourceFolder?: string;
   sourceId?: string;
   isCollection?: boolean;
+  originalName?: string;
 };
 
 type ResourceProfile = Pick<CatalogItem, "resourceType" | "category" | "tags" | "purpose" | "projects" | "color">;

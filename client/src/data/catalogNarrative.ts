@@ -200,6 +200,7 @@ const titleOverrides: Record<string, string> = {
 
 export const technicalFilters = [
   { id: "wordpress", label: "WordPress", note: "CMS WordPress" },
+  { id: "elementor", label: "Elementor", note: "Constructor visual de WordPress" },
   { id: "woocommerce", label: "WooCommerce", note: "Tienda sobre WordPress" },
   { id: "drupal", label: "Drupal", note: "CMS Drupal" },
   { id: "joomla", label: "Joomla", note: "CMS Joomla" },
@@ -211,6 +212,10 @@ export const technicalFilters = [
   { id: "capcut", label: "CapCut", note: "Edición CapCut" },
   { id: "photoshop", label: "Photoshop", note: "Adobe Photoshop" },
   { id: "design-tools", label: "Figma / Illustrator / Canva", note: "Diseño gráfico" },
+  { id: "react-native", label: "React Native", note: "Aplicaciones móviles nativas" },
+  { id: "expo", label: "Expo", note: "Entorno de desarrollo para React Native" },
+  { id: "html-bootstrap", label: "HTML / Bootstrap", note: "Plantillas web estáticas o Bootstrap" },
+  { id: "fonts", label: "Tipografías", note: "Fuentes para instalar en Windows o macOS" },
   { id: "audio-editor", label: "Editor de audio o vídeo", note: "Audio reutilizable" },
 ] as const;
 
@@ -219,6 +224,51 @@ export function technicalFor(item: CatalogItem): TechnicalCompatibility {
   const source = (item.sourceFolder ?? "Patrones Graficos").toLowerCase();
   const signals = `${name} ${item.tags.join(" ").toLowerCase()}`;
   const web = (apps: string[], environment: string, code: string, requirement: string, filterKeys: string[], caution?: string): TechnicalCompatibility => ({ apps, environment, code, requirement, filterKeys, caution });
+
+  if (source === "fuentes") return web(
+    ["Windows", "macOS", "Adobe Creative Cloud", "Figma", "Canva"],
+    "Windows o macOS; las fuentes pueden instalarse a nivel del sistema y aparecer en las aplicaciones compatibles.",
+    "No requiere código para instalar y usar; CSS con @font-face es necesario si se incorpora una fuente a una web.",
+    "Extraer el ZIP, revisar la licencia y formatos OTF/TTF/WOFF, instalar solo los estilos necesarios y reiniciar la aplicación de diseño.",
+    ["fonts", "design-tools"],
+    "La licencia del archivo determina si puedes usar la tipografía en proyectos comerciales, webfont o distribución a terceros."
+  );
+
+  if (source === "plantillas elementor ecommerce") return web(
+    ["WordPress", "Elementor", "WooCommerce"],
+    "Hosting WordPress con PHP y base de datos; navegador para la personalización visual.",
+    "No requiere código para la edición inicial; CSS, PHP y JavaScript sirven para ajustes avanzados de tienda o rendimiento.",
+    "Instalar WordPress, Elementor y los plugins exigidos por el kit; comprobar la versión de WooCommerce y cargar las plantillas según el README.",
+    ["wordpress", "elementor", "woocommerce"],
+    "Un kit Elementor no se instala como un tema HTML estático ni garantiza por sí solo pasarela de pago, hosting o licencias de imágenes."
+  );
+
+  if (source === "podcast y radio") return web(
+    ["WordPress", "Elementor", "WooCommerce"],
+    "Hosting WordPress con PHP y base de datos; navegador para editar emisiones, episodios y secciones visuales.",
+    "No requiere código para el uso inicial; CSS y JavaScript se aplican cuando se adapta el reproductor, analítica o comportamiento de la interfaz.",
+    "Instalar WordPress y Elementor; confirmar en el ZIP los plugins de podcast, audio o ecommerce que cada plantilla requiera.",
+    ["wordpress", "elementor"],
+    "La plantilla organiza la web; la emisión en directo, alojamiento de audio y distribución de podcasts requieren servicios o plugins adicionales."
+  );
+
+  if (source === "react native") return web(
+    ["React Native", "Expo", "Node.js", "Android Studio", "Xcode"],
+    "Windows, macOS o Linux para desarrollo; macOS es necesario para compilar de forma local para iOS.",
+    "Requiere JavaScript o TypeScript, Node.js y gestión de dependencias con npm o pnpm; algunos paquetes pueden incorporar backend propio.",
+    "Abrir package.json y README, instalar dependencias, configurar variables de entorno y confirmar la versión de React Native, Expo y SDK antes de ejecutar.",
+    ["react-native", "expo"],
+    "No todos los paquetes incluyen backend, API, claves de pago ni publicación en tiendas. Confirma dependencias, licencia y alcance antes de iniciar un producto."
+  );
+
+  if (source === "temas clasificados" || source === "veterinary clinic website") return web(
+    source === "temas clasificados" ? ["WordPress", "PHP", "MySQL"] : ["HTML", "Bootstrap", "React", "PHP"],
+    "Windows, macOS o Linux con editor de código; hosting compatible con PHP/Node.js cuando corresponda.",
+    "Las plantillas HTML/Bootstrap requieren edición de HTML, CSS y JavaScript; los temas WordPress requieren una instalación PHP y base de datos.",
+    "Extraer el ZIP y confirmar si se trata de HTML estático, Bootstrap, React o tema WordPress; revisar README, package.json o instrucciones de instalación.",
+    ["html-bootstrap", ...(source === "temas clasificados" ? ["wordpress"] : [])],
+    "El nombre comercial del paquete no confirma el framework exacto: utiliza los archivos internos para validar instalación, dependencias y uso permitido."
+  );
 
   if (source === "plantillas web") return web(
     ["HTML/CSS/JavaScript", "React", "Next.js", "Vue/Nuxt", "PHP/Laravel", "CodeIgniter", "Tailwind CSS", "Elementor"],

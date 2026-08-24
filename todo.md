@@ -120,8 +120,14 @@
 - [x] Implementar tooltips Lite de compatibilidad activables o desactivables globalmente.
 - [x] Verificar favoritos, tooltips y controles responsive.
 
-- [ ] Verificar acceso e inventariar la carpeta compartida de juanxaviercasa@gmail.com.
-- [ ] Clasificar sus recursos con fichas, etiquetas y compatibilidad técnica.
-- [ ] Registrar la cuenta como nueva fuente privada e integrar sus colecciones.
-- [ ] Verificar explorador, descargas y responsive.
-- [ ] Guardar checkpoint y hacer push a GitHub.
+- [x] Verificar acceso e inventariar la carpeta compartida de juanxaviercasa@gmail.com.
+- [x] Clasificar sus recursos con fichas, etiquetas y compatibilidad técnica.
+- [x] Registrar la cuenta como nueva fuente privada e integrar sus colecciones.
+- [x] Verificar explorador, descargas y responsive.
+- [x] Guardar checkpoint y hacer push a GitHub.
+- [x] Definir filtros técnicos rápidos para WordPress/Elementor, React Native/Expo, HTML/Bootstrap y tipografías.
+- [x] Implementar filtros técnicos visibles y persistentes en el catálogo.
+- [x] Crear una ficha detallada expandible con compatibilidad, requisitos, usos y enlace de origen.
+- [x] Añadir exportación descargable del resultado filtrado en CSV y Markdown.
+- [x] Validar filtros, detalle y exportación en escritorio y móvil.
+- [ ] Guardar checkpoint, publicar y sincronizar la actualización con GitHub.
