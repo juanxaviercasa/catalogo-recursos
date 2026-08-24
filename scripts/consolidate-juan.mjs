@@ -19,6 +19,7 @@ const fromRows = (file, id, name) => {
   return { id, name, entries };
 };
 const collections = [
+  fromRows(`${root}/data/juanxaviercasa-fonts-inventory.json`, "1rtobT7ZLAVQirM03JMv_zABcFSgH3XQr", "fuentes"),
   fromRows(`${root}/../console_outputs/exec_result_2026-08-24_01-08-48_372.txt`, "137KBWcJDZonm4XkyWO8fYBigMih9w2O8", "plantillas elementor ecommerce"),
   fromRows(`${root}/../console_outputs/exec_result_2026-08-24_01-09-26_413.txt`, "1UzauNB91iruzLfQ0hSBUydWE7ZyyPXAr", "Podcast y radio"),
   fromRows(`${root}/../console_outputs/exec_result_2026-08-24_01-10-28_729.txt`, "1GCDgycr_a2OXrhLcUt-twHNuliSwT_2T", "React Native"),
