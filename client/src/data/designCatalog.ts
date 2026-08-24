@@ -4,7 +4,9 @@
 import { catalog, type CatalogItem } from "@/data/catalog";
 import { individualPackages } from "@/data/designPackages";
 import { plantillasWebCatalog } from "@/data/plantillasWebCatalog";
+import { materialesRecursos53Catalog } from "@/data/materialesRecursos53Catalog";
 import { webCatalog } from "@/data/webCatalog";
+import { juanxaviercasaCatalog } from "@/data/juanxaviercasaCatalog";
 
 type Row = [id: string, name: string, sourceFolder: string, category: CatalogItem["category"], type: string, tags: string[], purpose: string, projects: string[], color: string, collection?: boolean];
 
@@ -85,6 +87,6 @@ export const characterPackages: CatalogItem[] = characterRows.map(([id, name]) =
   modified: "20 oct 2024",
 }));
 
-export const fullCatalog: CatalogItem[] = [...catalog.map((item) => ({ ...item, sourceFolder: "Patrones Graficos" })), ...designCatalog, ...characterPackages, ...individualPackages, ...webCatalog, ...plantillasWebCatalog];
+export const fullCatalog: CatalogItem[] = [...catalog.map((item) => ({ ...item, sourceFolder: "Patrones Graficos" })), ...designCatalog, ...characterPackages, ...individualPackages, ...webCatalog, ...plantillasWebCatalog, ...materialesRecursos53Catalog, ...juanxaviercasaCatalog];
 
-export const sourceFolders = ["Diseño Grafico", "Patrones Graficos", "3D BUILDER", "capcut pro", "iconos", "musicas", "photoshop", "Diseño Web"];
+export const sourceFolders = ["Diseño Grafico", "Patrones Graficos", "3D BUILDER", "capcut pro", "iconos", "musicas", "photoshop", "Diseño Web", "Diversos", "fuentes", "plantillas elementor ecommerce", "Podcast y radio", "React Native", "Temas Clasificados", "Veterinary Clinic Website"];

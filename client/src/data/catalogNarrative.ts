@@ -181,6 +181,15 @@ const titleOverrides: Record<string, string> = {
   OpenCart: "Tienda online para vender un catálogo de productos",
   "Plantillas Word": "Documentos profesionales para presentar y vender ideas",
   "Plantillas Web 1–25 · Código y sitios comerciales": "Biblioteca web para lanzar productos, servicios y sitios con código",
+  "Academia Online - WordPress": "Campus online listo para cursos, clases y comunidad",
+  Behance: "Portfolio creativo para mostrar trabajo y captar proyectos",
+  "Diapositivas de matematicas": "Presentaciones de matemáticas para enseñar con claridad",
+  "google slides": "Biblioteca de Google Slides para clases, tesis y presentaciones",
+  "logo y email": "Identidad y email listos para lanzar una marca",
+  "Math Graphic Templates": "Recursos visuales de matemáticas para clases y campañas",
+  musicas: "Música lista para vídeos, campañas y presentaciones",
+  "Plantillas Web de Figma": "Interfaces web de Figma para diseñar antes de desarrollar",
+  "temas prestashop": "Tienda PrestaShop lista para organizar catálogo y ventas",
   "Plugins · WordPress, WooCommerce y Elementor": "Funciones extra para convertir WordPress en una herramienta comercial",
   "Shopify 11–21": "Tienda Shopify de marca lista para lanzar productos",
   "Shopify Premium": "Tienda premium para una marca que quiere vender con confianza",
@@ -197,6 +206,7 @@ export const technicalFilters = [
   { id: "ghost", label: "Ghost", note: "CMS Ghost" },
   { id: "shopify", label: "Shopify", note: "Tienda Shopify" },
   { id: "opencart", label: "OpenCart", note: "Tienda OpenCart" },
+  { id: "prestashop", label: "PrestaShop", note: "Tienda PrestaShop" },
   { id: "fcpx", label: "Final Cut Pro", note: "FCPX en macOS" },
   { id: "capcut", label: "CapCut", note: "Edición CapCut" },
   { id: "photoshop", label: "Photoshop", note: "Adobe Photoshop" },
@@ -218,6 +228,13 @@ export function technicalFor(item: CatalogItem): TechnicalCompatibility {
     ["design-tools"],
     "La colección reúne tecnologías diferentes: no todas las plantillas sirven para el mismo framework, CMS o hosting. Revisa el nombre y los archivos internos de cada recurso antes de instalarlo."
   );
+
+  if (source === "academia online - wordpress") return web(["WordPress", "Elementor", "LMS"], "Navegador + hosting WordPress con PHP y base de datos", "La personalización inicial se hace desde WordPress y Elementor; CSS, PHP y JavaScript se usan para ajustes avanzados.", "Revisar cada ZIP para confirmar versión de WordPress, constructor y plugin LMS requerido antes de instalarlo.", ["wordpress", "design-tools"], "No todos los temas incluyen el mismo LMS ni son compatibles con la misma versión de WordPress o Elementor.");
+  if (source === "behance") return web(["Google Slides", "PowerPoint", "HTML", "WordPress"], "Windows, macOS o navegador según el recurso elegido", "Algunos recursos se editan sin código; los templates HTML y WordPress requieren conocimientos técnicos para personalizaciones profundas.", "Abrir el ZIP y comprobar si contiene una presentación, plantilla HTML o tema de WordPress antes de empezar.", ["design-tools", "wordpress"], "La colección mezcla formatos de portfolio, presentación y web; cada archivo puede requerir una aplicación diferente.");
+  if (source === "diapositivas de matematicas" || source === "google slides") return web(["Google Slides", "Microsoft PowerPoint", "Apple Keynote", "Canva"], "Navegador, Windows o macOS", "No requiere código; edita textos, gráficas, colores e imágenes en el software de presentaciones compatible.", "Extraer el ZIP y verificar si incluye formato para Google Slides, PowerPoint o Keynote antes de editar.", ["design-tools"], "No todas las plantillas se abren de forma nativa en el mismo programa; confirma el formato de cada archivo.");
+  if (source === "logo y email" || source === "math graphic templates") return web(["Figma", "Adobe Illustrator", "Adobe Photoshop", "Canva", "Editor de email"], "Navegador, Windows o macOS", "No requiere código para la edición visual; una plantilla de email puede requerir HTML para ajustes avanzados.", "Extraer el ZIP y revisar si contiene SVG, AI, PSD, PNG o HTML para elegir la aplicación adecuada.", ["design-tools"], "La colección combina recursos de branding, interfaces y comunicación; comprueba los archivos internos antes de editarlos.");
+  if (source === "plantillas web de figma") return web(["Figma", "FigJam", "Editor de código"], "Navegador, Windows o macOS", "No requiere código para prototipar; HTML, CSS y JavaScript se utilizan si se implementa el diseño en producción.", "Abrir el recurso en Figma y revisar estilos, componentes y exportables antes de entregarlo a desarrollo.", ["design-tools"], "Estas son interfaces de diseño: no se convierten automáticamente en un sitio funcional sin implementación técnica.");
+  if (source === "temas prestashop") return web(["PrestaShop", "Editor de temas PrestaShop"], "Navegador + hosting con PHP y base de datos compatible con PrestaShop", "La personalización básica se hace desde PrestaShop; Smarty, PHP, CSS y JavaScript se usan para ajustes avanzados.", "Revisar el ZIP para confirmar la versión de PrestaShop, módulos requeridos e instrucciones de instalación.", ["prestashop"], "No funciona como tema de Shopify, WordPress o WooCommerce sin una migración o desarrollo específico.");
 
   if (source === "diseño web") {
     if (/plugins/.test(name)) return web(["WordPress", "WooCommerce", "Elementor"], "Navegador + hosting WordPress compatible", "No requiere código para instalar y configurar lo básico; PHP, CSS y JavaScript solo para personalizaciones avanzadas.", "Necesitas un sitio WordPress activo; las extensiones de tienda requieren WooCommerce y las de diseño visual requieren Elementor cuando el plugin lo indique.", ["wordpress", "woocommerce"], "No todos los plugins sirven para cualquier versión de WordPress: revisa compatibilidad, licencia y requisitos de cada ZIP antes de instalarlos.");

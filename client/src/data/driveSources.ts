@@ -3,6 +3,7 @@ export type DriveSource = {
   account: string;
   label: string;
   folderUrl: string;
+  indexedCount: number;
 };
 
 // Registro extensible: añade aquí nuevas cuentas de Drive cuando se integren más orígenes.
@@ -12,12 +13,28 @@ export const driveSources: DriveSource[] = [
     account: "cofredelemprendedor@gmail.com",
     label: "Fuente personal de Drive",
     folderUrl: "https://drive.google.com/drive/folders/1-Ji4Gevs5bv7CjkQ34uKm1pi6DYlf0KL",
+    indexedCount: 263,
   },
   {
     id: "materialesrecursos52",
     account: "materialesrecursos52@gmail.com",
     label: "Biblioteca compartida de plantillas web",
     folderUrl: "https://drive.google.com/drive/folders/1SR8ktuNbLOzxtpp4YHO6ApRF2FQeIxOR",
+    indexedCount: 46,
+  },
+  {
+    id: "materialesrecursos53",
+    account: "materialesrecursos53@gmail.com",
+    label: "Biblioteca compartida Diversos",
+    folderUrl: "https://drive.google.com/drive/folders/1w4dhYf5JjmMDeaXTRHnZTR00zS4rz-wW",
+    indexedCount: 317,
+  },
+  {
+    id: "juanxaviercasa",
+    account: "juanxaviercasa@gmail.com",
+    label: "Materiales Diversos · biblioteca personal",
+    folderUrl: "https://drive.google.com/drive/folders/11fXUqfBt3zcbl5I5EkO92BiLBgTT2xOj",
+    indexedCount: 168,
   },
 ];
 

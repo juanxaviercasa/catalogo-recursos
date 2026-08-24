@@ -78,3 +78,50 @@
 - [x] Integrar la nueva fuente y sus colecciones en filtros, explorador y descargas.
 - [x] Unificar los recursos nuevos con el catálogo existente sin crear una vista separada.
 - [x] Verificar la nueva fuente en escritorio y móvil.
+- [x] Definir campos, coincidencias y operadores de la búsqueda avanzada.
+- [x] Implementar búsqueda avanzada con criterios visibles y restablecimiento rápido.
+- [x] Añadir ordenación interactiva del catálogo por relevancia, nombre, tamaño y tipo.
+- [x] Verificar búsqueda y ordenación en escritorio, tableta y móvil.
+- [x] Definir la estructura persistente de una consulta guardada.
+- [x] Añadir creación, carga y eliminación de consultas guardadas.
+- [x] Añadir intervalo exacto de tamaño mínimo y máximo en MB.
+- [ ] Verificar persistencia, rango de tamaño y diseño responsive.
+- [x] Verificar el acceso y extraer el inventario real de la carpeta de materialesrecursos53.
+- [x] Registrar materialesrecursos53@gmail.com como tercera fuente privada de Drive.
+- [x] Clasificar la colección y redactar su ficha editorial y compatibilidad.
+- [x] Integrar sus archivos en catálogo, explorador, filtros y descargas.
+- [x] Verificar la tercera fuente en escritorio y móvil.
+- [x] Definir extensiones filtrables y formatos multimedia con vista previa.
+- [x] Añadir filtros directos por extensión dentro del explorador.
+- [x] Implementar un visor contextual para imágenes, audio y vídeo compatibles.
+- [x] Verificar filtros y vista previa en escritorio y móvil.
+- [x] Definir reglas de cola de audio, colecciones por extensión y cuadrícula de imágenes.
+- [x] Implementar reproducción continua para pistas de audio seleccionadas.
+- [x] Permitir guardar una colección desde la extensión activa.
+- [x] Añadir alternancia entre lista y cuadrícula para imágenes.
+- [x] Verificar reproducción, persistencia y controles responsive.
+- [x] Definir el orden manual, repetición y temporización de las secuencias.
+- [x] Añadir reordenación manual y modo repetición a las listas de audio.
+- [x] Implementar presentación automática para imágenes de la cuadrícula.
+- [x] Verificar listas, repetición, presentación y controles responsive.
+- [x] Definir persistencia de playlists, duraciones y criterios para visuales de exploración.
+- [x] Permitir guardar, cargar y eliminar playlists de audio nombradas.
+- [x] Añadir selector de duración y transiciones suaves a la presentación de imágenes.
+- [x] Analizar mapas mentales, organigramas y visuales de recomendación adecuados para el catálogo.
+- [x] Verificar persistencia, presentación y controles responsive.
+- [x] Definir rutas de decisión, relaciones contextuales y grupos de formato a partir de datos existentes.
+- [x] Implementar el mapa de decisión guiado por objetivo, entorno y formato.
+- [x] Añadir el mapa contextual de usos y recursos afines en cada ficha.
+- [x] Crear el árbol editorial de formatos como vista alternativa de colección.
+- [x] Renombrar carrito y sus acciones como lista de descargas.
+- [x] Verificar mapas, descargas y responsive en escritorio y móvil.
+- [x] Definir persistencia de favoritos por rama y preferencia global de tooltips.
+- [x] Añadir favoritos persistentes dentro de cada rama del árbol editorial.
+- [x] Implementar tooltips Lite de compatibilidad activables o desactivables globalmente.
+- [x] Verificar favoritos, tooltips y controles responsive.
+
+- [ ] Verificar acceso e inventariar la carpeta compartida de juanxaviercasa@gmail.com.
+- [ ] Clasificar sus recursos con fichas, etiquetas y compatibilidad técnica.
+- [ ] Registrar la cuenta como nueva fuente privada e integrar sus colecciones.
+- [ ] Verificar explorador, descargas y responsive.
+- [ ] Guardar checkpoint y hacer push a GitHub.
