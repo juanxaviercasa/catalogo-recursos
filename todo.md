@@ -130,4 +130,4 @@
 - [x] Crear una ficha detallada expandible con compatibilidad, requisitos, usos y enlace de origen.
 - [x] Añadir exportación descargable del resultado filtrado en CSV y Markdown.
 - [x] Validar filtros, detalle y exportación en escritorio y móvil.
-- [ ] Guardar checkpoint, publicar y sincronizar la actualización con GitHub.
+- [x] Guardar checkpoint, publicar y sincronizar la actualización con GitHub.
