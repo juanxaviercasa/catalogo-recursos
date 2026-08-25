@@ -136,4 +136,4 @@
 - [x] Mostrar un indicador de requisitos mínimos en tarjetas y fichas detalladas.
 - [x] Implementar selección persistente de recursos y acciones para crear o descargar su lista.
 - [x] Validar filtros, indicadores y selección en escritorio y móvil.
-- [ ] Guardar checkpoint, publicar y sincronizar GitHub.
+- [x] Guardar checkpoint, publicar y sincronizar GitHub.
