@@ -97,3 +97,7 @@ Un símbolo sin texto compuesto por tres pestañas superpuestas, donde la pesta�
 - Las fuentes de Drive abren capítulos de registro independientes; la cuadrícula sólo facilita comparar recursos dentro de cada capítulo y no sustituye la lectura documental.
 - La espina de oliva `#61765B` une portada, controles, capítulos y registros. El amarillo queda para folios y decisiones activas; el coral se limita a avisos y excepciones.
 - El monograma de tres pestañas aparece de forma visible en la portada y en la línea de identidad, como señal de marca integrada al sistema de archivo.
+- La espina oliva se concentra como gesto estructural continuo entre portada, ruta, capítulos y registros; los divisores secundarios usan tinta suave o arena para no competir con ella.
+- Cada fuente se abre con una pausa de capítulo más visible: folio, cuenta de origen, total y banda tipográfica antes de sus registros.
+- Fraunces se reserva para identidad, capítulos, folios y totales; DM Sans ordena acciones, filtros, compatibilidades y metadatos operativos.
+- Amarillo archivo señala selección, exportación o estado activo; coral queda limitado a avisos y excepciones de descarga.

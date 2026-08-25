@@ -53,8 +53,13 @@ import {
 } from "@/data/driveSources";
 import {
   describeResource,
+  licenseReviewFilters,
+  licenseReviewFor,
+  matchesLicenseReview,
   matchesTechnicalFilter,
+  minimumRequirementFor,
   technicalFilters,
+  type LicenseReviewKey,
 } from "@/data/catalogNarrative";
 import {
   goalsForResource,
@@ -65,6 +70,7 @@ import {
 type Filter = "Todo" | ResourceCategory;
 type GoalFilter = "Todo" | ProjectGoalId;
 type TechnicalFilter = "Todo" | (typeof technicalFilters)[number]["id"];
+type LicenseFilter = "Todo" | LicenseReviewKey;
 type SizeFilter = "Todo" | "small" | "medium" | "large" | "collection";
 type SearchScope = "all" | "title" | "tags" | "technical" | "projects";
 type SearchMatch = "contains" | "allWords" | "exact";
@@ -95,6 +101,7 @@ type SavedSearch = {
   filter: Filter;
   goalFilter: GoalFilter;
   technicalFilter: TechnicalFilter;
+  licenseFilter: LicenseFilter;
   activeTag: string | null;
   createdAt: string;
 };
@@ -235,6 +242,7 @@ export default function Home() {
   const [goalFilter, setGoalFilter] = useState<GoalFilter>("Todo");
   const [technicalFilter, setTechnicalFilter] =
     useState<TechnicalFilter>("Todo");
+  const [licenseFilter, setLicenseFilter] = useState<LicenseFilter>("Todo");
   const [sizeFilter, setSizeFilter] = useState<SizeFilter>("Todo");
   const [query, setQuery] = useState("");
   const [searchScope, setSearchScope] = useState<SearchScope>("all");
@@ -298,6 +306,16 @@ export default function Home() {
     }
   });
   const [cartOpen, setCartOpen] = useState(false);
+  const [selectionIds, setSelectionIds] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      return JSON.parse(
+        window.localStorage.getItem("indice-drive:selection") ?? "[]"
+      ) as string[];
+    } catch {
+      return [];
+    }
+  });
   const [downloadProgress, setDownloadProgress] =
     useState<DownloadProgress>(null);
   const [exportOpen, setExportOpen] = useState(false);
@@ -350,6 +368,7 @@ export default function Home() {
       const goalMatch =
         goalFilter === "Todo" || goalsForResource(item).includes(goalFilter);
       const technicalMatch = matchesTechnicalFilter(item, technicalFilter);
+      const licenseMatch = matchesLicenseReview(item, licenseFilter);
       const sizeMatch = matchesSizeFilter(item, sizeFilter);
       const tagMatch = !activeTag || item.tags.includes(activeTag);
       const favoriteMatch = !showFavorites || favorites.includes(item.id);
@@ -385,6 +404,7 @@ export default function Home() {
         categoryMatch &&
         goalMatch &&
         technicalMatch &&
+        licenseMatch &&
         sizeMatch &&
         tagMatch &&
         favoriteMatch &&
@@ -419,6 +439,7 @@ export default function Home() {
     filter,
     goalFilter,
     technicalFilter,
+    licenseFilter,
     sizeFilter,
     query,
     searchScope,
@@ -465,6 +486,12 @@ export default function Home() {
         ? current.filter(itemId => itemId !== id)
         : [...current, id]
     );
+  const toggleSelection = (id: string) =>
+    setSelectionIds(current =>
+      current.includes(id)
+        ? current.filter(itemId => itemId !== id)
+        : [...current, id]
+    );
   const comparisonItems = useMemo(
     () =>
       compareIds
@@ -478,6 +505,13 @@ export default function Home() {
         .map(id => fullCatalog.find(item => item.id === id))
         .filter((item): item is CatalogItem => Boolean(item)),
     [cartIds]
+  );
+  const selectionItems = useMemo(
+    () =>
+      selectionIds
+        .map(id => fullCatalog.find(item => item.id === id))
+        .filter((item): item is CatalogItem => Boolean(item)),
+    [selectionIds]
   );
   const cartWeight = useMemo(
     () => cartItems.reduce((sum, item) => sum + (sizeInMb(item) ?? 0), 0),
@@ -602,6 +636,17 @@ export default function Home() {
   useEffect(() => {
     try {
       window.localStorage.setItem(
+        "indice-drive:selection",
+        JSON.stringify(selectionIds)
+      );
+    } catch {
+      /* La selección continúa activa durante la sesión si el navegador bloquea el almacenamiento local. */
+    }
+  }, [selectionIds]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
         "indice-drive:saved-searches",
         JSON.stringify(savedSearches)
       );
@@ -697,6 +742,7 @@ export default function Home() {
       filter === "Todo" &&
       goalFilter === "Todo" &&
       technicalFilter === "Todo" &&
+      licenseFilter === "Todo" &&
       sizeFilter === "Todo" &&
       !activeTag
     ) {
@@ -719,6 +765,7 @@ export default function Home() {
       filter,
       goalFilter,
       technicalFilter,
+      licenseFilter,
       activeTag,
       createdAt: new Date().toLocaleDateString("es"),
     };
@@ -739,6 +786,7 @@ export default function Home() {
     setFilter(savedSearch.filter);
     setGoalFilter(savedSearch.goalFilter);
     setTechnicalFilter(savedSearch.technicalFilter);
+    setLicenseFilter(savedSearch.licenseFilter ?? "Todo");
     setActiveTag(savedSearch.activeTag);
     setShowFavorites(false);
     setAdvancedSearchOpen(true);
@@ -768,6 +816,14 @@ export default function Home() {
     };
     setDownloadProgress({ current: 0, total });
     prepareNext();
+  };
+
+  const addSelectionToCart = () => {
+    if (!selectionIds.length) return;
+    setCartIds(current => Array.from(new Set([...current, ...selectionIds])));
+    setNotice(
+      `${selectionIds.length} recursos seleccionados se añadieron a la lista de descargas.`
+    );
   };
 
   const applyDecisionRoute = () => {
@@ -1320,6 +1376,7 @@ export default function Home() {
                   filter !== "Todo",
                   goalFilter !== "Todo",
                   technicalFilter !== "Todo",
+                  licenseFilter !== "Todo",
                   sizeFilter !== "Todo",
                   Boolean(activeTag),
                 ].filter(Boolean).length
@@ -1488,6 +1545,50 @@ export default function Home() {
                   </button>
                 )}
               </div>
+              <div className="license-rail">
+                <div>
+                  <span>Licencia y uso</span>
+                  <p>
+                    El índice orienta qué revisar; no confirma permisos de
+                    licencia ni uso comercial.
+                  </p>
+                </div>
+                <div>
+                  {licenseReviewFilters.map(item => (
+                    <button
+                      key={item.id}
+                      title={tooltipsEnabled ? item.note : undefined}
+                      onClick={() =>
+                        setLicenseFilter(
+                          licenseFilter === item.id ? "Todo" : item.id
+                        )
+                      }
+                      className={
+                        licenseFilter === item.id
+                          ? "license-pill license-pill--active"
+                          : "license-pill"
+                      }
+                    >
+                      {item.label}
+                      <b>
+                        {
+                          fullCatalog.filter(resource =>
+                            matchesLicenseReview(resource, item.id)
+                          ).length
+                        }
+                      </b>
+                    </button>
+                  ))}
+                </div>
+                {licenseFilter !== "Todo" && (
+                  <button
+                    className="clear-license"
+                    onClick={() => setLicenseFilter("Todo")}
+                  >
+                    Quitar licencia
+                  </button>
+                )}
+              </div>
               <div className="size-rail">
                 <div>
                   <span>Tamaño de archivo</span>
@@ -1599,9 +1700,12 @@ export default function Home() {
                   ? "Archivos guardados"
                   : activeGoal
                     ? activeGoal.label
-                    : technicalFilter !== "Todo"
-                      ? `Compatible con ${technicalFilters.find(item => item.id === technicalFilter)?.label}`
-                      : exactSizeActive
+                  : technicalFilter !== "Todo"
+                    ? `Compatible con ${technicalFilters.find(item => item.id === technicalFilter)?.label}`
+                    : licenseFilter !== "Todo"
+                      ? licenseReviewFilters.find(item => item.id === licenseFilter)
+                          ?.label
+                    : exactSizeActive
                         ? `Tamaño exacto · ${minSize || "0"}–${maxSize || "∞"} MB`
                         : sizeFilter !== "Todo"
                           ? activeSize?.label
@@ -1614,11 +1718,15 @@ export default function Home() {
                   ? `Filtrando por #${activeTag}`
                   : activeGoal
                     ? activeGoal.description
-                    : technicalFilter !== "Todo"
-                      ? technicalFilters.find(
-                          item => item.id === technicalFilter
+                  : technicalFilter !== "Todo"
+                    ? technicalFilters.find(
+                        item => item.id === technicalFilter
+                      )?.note
+                    : licenseFilter !== "Todo"
+                      ? licenseReviewFilters.find(
+                          item => item.id === licenseFilter
                         )?.note
-                      : exactSizeActive
+                    : exactSizeActive
                         ? "Rango exacto aplicado a archivos con peso conocido."
                         : sizeFilter !== "Todo"
                           ? activeSize?.note
@@ -1712,6 +1820,35 @@ export default function Home() {
               </button>
             </aside>
           )}
+          {selectionIds.length > 0 && (
+            <aside className="selection-dock" aria-label="Selección actual">
+              <div>
+                <Check size={18} />
+                <span>
+                  <b>{selectionIds.length} seleccionados</b>
+                  <small>
+                    Lista persistente para exportar o preparar descargas.
+                  </small>
+                </span>
+              </div>
+              <button
+                onClick={() =>
+                  exportCatalog(selectionItems, "markdown", setNotice)
+                }
+              >
+                Exportar lista
+              </button>
+              <button className="selection-to-cart" onClick={addSelectionToCart}>
+                Agregar a descargas
+              </button>
+              <button
+                className="selection-clear"
+                onClick={() => setSelectionIds([])}
+              >
+                Limpiar
+              </button>
+            </aside>
+          )}
           {cartIds.length > 0 && (
             <aside className="cart-dock">
               <div>
@@ -1770,9 +1907,11 @@ export default function Home() {
                       favorite={favorites.includes(item.id)}
                       comparisonSelected={compareIds.includes(item.id)}
                       cartSelected={cartIds.includes(item.id)}
+                      selected={selectionIds.includes(item.id)}
                       onFavorite={() => toggleFavorite(item.id)}
                       onCompare={() => toggleCompare(item.id)}
                       onCart={() => toggleCart(item.id)}
+                      onSelect={() => toggleSelection(item.id)}
                       onOpen={() => setSelected(item)}
                     />
                   ))}
@@ -1822,9 +1961,11 @@ export default function Home() {
             item={selected}
             favorite={favorites.includes(selected.id)}
             cartSelected={cartIds.includes(selected.id)}
+            selected={selectionIds.includes(selected.id)}
             onClose={() => setSelected(null)}
             onFavorite={() => toggleFavorite(selected.id)}
             onCart={() => toggleCart(selected.id)}
+            onSelect={() => toggleSelection(selected.id)}
             onOpen={setSelected}
           />
         ))}
@@ -1879,9 +2020,11 @@ function ResourceCard({
   favorite,
   comparisonSelected,
   cartSelected,
+  selected,
   onFavorite,
   onCompare,
   onCart,
+  onSelect,
   onOpen,
 }: {
   item: CatalogItem;
@@ -1889,14 +2032,18 @@ function ResourceCard({
   favorite: boolean;
   comparisonSelected: boolean;
   cartSelected: boolean;
+  selected: boolean;
   onFavorite: () => void;
   onCompare: () => void;
   onCart: () => void;
+  onSelect: () => void;
   onOpen: () => void;
 }) {
   const narrative = describeResource(item);
   const downloadUrl = directDownloadUrl(item);
   const source = sourceFor(item);
+  const requirement = minimumRequirementFor(item);
+  const license = licenseReviewFor(item);
   return (
     <article
       className={`resource-card resource-card--${item.color}`}
@@ -1967,6 +2114,18 @@ function ResourceCard({
           <b>{narrative.technical.apps.slice(0, 2).join(" · ")}</b>
           <small>{narrative.technical.environment}</small>
         </div>
+        <div
+          className={`requirement-teaser requirement-teaser--${requirement.level}`}
+          title={requirement.note}
+        >
+          <span>REQUISITO MÍNIMO</span>
+          <b>{requirement.shortLabel}</b>
+          <small>{requirement.label}</small>
+        </div>
+        <div className="license-teaser" title={license.note}>
+          <span>LICENCIA</span>
+          <b>{license.shortLabel}</b>
+        </div>
         <p>{narrative.value}</p>
         <div className="scenario-teaser">
           <span>3 casos ideales</span>
@@ -1980,6 +2139,14 @@ function ResourceCard({
         <div className="resource-card-actions">
           <button className="resource-more" onClick={onOpen}>
             Abrir ficha detallada <ArrowUpRight size={15} />
+          </button>
+          <button
+            className={`resource-select ${selected ? "resource-select--active" : ""}`}
+            onClick={onSelect}
+            aria-pressed={selected}
+          >
+            <Check size={15} />
+            {selected ? "Seleccionado" : "Seleccionar"}
           </button>
           <a className="resource-download" href={downloadUrl}>
             <Download size={15} />
@@ -2005,17 +2172,21 @@ function ResourceDrawer({
   item,
   favorite,
   cartSelected,
+  selected,
   onClose,
   onFavorite,
   onCart,
+  onSelect,
   onOpen,
 }: {
   item: CatalogItem;
   favorite: boolean;
   cartSelected: boolean;
+  selected: boolean;
   onClose: () => void;
   onFavorite: () => void;
   onCart: () => void;
+  onSelect: () => void;
   onOpen: (item: CatalogItem) => void;
 }) {
   const driveUrl = item.isCollection
@@ -2024,6 +2195,8 @@ function ResourceDrawer({
   const downloadUrl = directDownloadUrl(item);
   const narrative = describeResource(item);
   const source = sourceFor(item);
+  const requirement = minimumRequirementFor(item);
+  const license = licenseReviewFor(item);
   const related = fullCatalog
     .filter(candidate => candidate.id !== item.id)
     .map(candidate => ({
@@ -2097,6 +2270,19 @@ function ResourceDrawer({
               <span>ENTORNO</span>
               <b>{narrative.technical.environment}</b>
             </div>
+            <div>
+              <span>REQUISITO MÍNIMO</span>
+              <b>{requirement.shortLabel}</b>
+            </div>
+            <div>
+              <span>LICENCIA</span>
+              <b>{license.shortLabel}</b>
+            </div>
+          </section>
+          <section className="drawer-license-note">
+            <h3>Revisión antes de usar</h3>
+            <p>{license.note}</p>
+            <small>{requirement.note}</small>
           </section>
           <section>
             <h3>Fuente de Drive</h3>
@@ -2212,6 +2398,14 @@ function ResourceDrawer({
             >
               <ShoppingCart size={16} />
               {cartSelected ? "En descargas" : "Agregar a descargas"}
+            </button>
+            <button
+              className={`drawer-select ${selected ? "drawer-select--active" : ""}`}
+              onClick={onSelect}
+              aria-pressed={selected}
+            >
+              <Check size={16} />
+              {selected ? "Seleccionado" : "Seleccionar"}
             </button>
             <a className="drawer-download" href={downloadUrl}>
               <Download size={16} />

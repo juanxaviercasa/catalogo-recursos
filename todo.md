@@ -131,3 +131,9 @@
 - [x] Añadir exportación descargable del resultado filtrado en CSV y Markdown.
 - [x] Validar filtros, detalle y exportación en escritorio y móvil.
 - [x] Guardar checkpoint, publicar y sincronizar la actualización con GitHub.
+- [x] Definir estados de licencia informativos sin inferir permisos jurídicos no verificados.
+- [x] Añadir el filtro visible por licencia o verificación pendiente al catálogo.
+- [x] Mostrar un indicador de requisitos mínimos en tarjetas y fichas detalladas.
+- [x] Implementar selección persistente de recursos y acciones para crear o descargar su lista.
+- [x] Validar filtros, indicadores y selección en escritorio y móvil.
+- [ ] Guardar checkpoint, publicar y sincronizar GitHub.

@@ -24,6 +24,22 @@ export type ResourceNarrative = {
   technical: TechnicalCompatibility;
 };
 
+export type LicenseReviewKey = "archive" | "font-media" | "web-code";
+
+export type LicenseReview = {
+  key: LicenseReviewKey;
+  label: string;
+  shortLabel: string;
+  note: string;
+};
+
+export type MinimumRequirement = {
+  level: "direct" | "setup" | "development";
+  label: string;
+  shortLabel: string;
+  note: string;
+};
+
 type BaseNarrative = Omit<ResourceNarrative, "technical">;
 
 const narratives: Record<ResourceCategory, BaseNarrative> = {
@@ -219,6 +235,16 @@ export const technicalFilters = [
   { id: "audio-editor", label: "Editor de audio o vídeo", note: "Audio reutilizable" },
 ] as const;
 
+export const licenseReviewFilters: Array<{
+  id: LicenseReviewKey;
+  label: string;
+  note: string;
+}> = [
+  { id: "archive", label: "Archivo y autoría", note: "Revisa el texto de licencia, atribución y alcance de uso dentro del archivo." },
+  { id: "font-media", label: "Fuentes y medios", note: "Verifica los términos de uso comercial, sincronización, webfont o distribución del material." },
+  { id: "web-code", label: "Código y distribución", note: "Confirma licencia de tema, plugins, dependencias y condiciones de redistribución antes de publicar." },
+];
+
 export function technicalFor(item: CatalogItem): TechnicalCompatibility {
   const name = item.name.toLowerCase();
   const source = (item.sourceFolder ?? "Patrones Graficos").toLowerCase();
@@ -314,6 +340,71 @@ export function technicalFor(item: CatalogItem): TechnicalCompatibility {
 
 export function matchesTechnicalFilter(item: CatalogItem, filterId: string) {
   return filterId === "Todo" || technicalFor(item).filterKeys.includes(filterId);
+}
+
+export function licenseReviewFor(item: CatalogItem): LicenseReview {
+  const technical = technicalFor(item);
+  const source = (item.sourceFolder ?? "").toLowerCase();
+  const name = `${item.name} ${item.originalName ?? ""}`.toLowerCase();
+  const isWebOrCode = technical.filterKeys.some((key) => ["wordpress", "elementor", "woocommerce", "drupal", "joomla", "ghost", "shopify", "opencart", "prestashop", "react-native", "expo", "html-bootstrap"].includes(key)) || /template|theme|plugin|bootstrap|react|wordpress|shopify|prestashop/.test(name);
+  if (isWebOrCode) return {
+    key: "web-code",
+    label: "Licencia y distribución por confirmar",
+    shortLabel: "Código y distribución",
+    note: "El inventario no valida licencias. Revisa el README, la licencia del paquete y sus dependencias antes de publicar, revender o redistribuir.",
+  };
+  const isFontOrMedia = technical.filterKeys.some((key) => ["fonts", "audio-editor", "fcpx", "capcut"].includes(key)) || /font|audio|music|musica|video|motion|podcast/.test(`${source} ${name}`);
+  if (isFontOrMedia) return {
+    key: "font-media",
+    label: "Uso comercial por confirmar",
+    shortLabel: "Fuentes y medios",
+    note: "Comprueba si el archivo permite uso comercial, sincronización audiovisual, webfont, edición o distribución según corresponda.",
+  };
+  return {
+    key: "archive",
+    label: "Licencia del archivo por confirmar",
+    shortLabel: "Archivo y autoría",
+    note: "Consulta la licencia, atribución y restricciones incluidas en el ZIP o en la fuente original antes de publicar el resultado.",
+  };
+}
+
+export function matchesLicenseReview(item: CatalogItem, filterId: "Todo" | LicenseReviewKey) {
+  return filterId === "Todo" || licenseReviewFor(item).key === filterId;
+}
+
+export function minimumRequirementFor(item: CatalogItem): MinimumRequirement {
+  const technical = technicalFor(item);
+  const keys = technical.filterKeys;
+  if (keys.some((key) => ["react-native", "expo", "html-bootstrap"].includes(key))) return {
+    level: "development",
+    label: "Requiere desarrollo",
+    shortLabel: "Node + proyecto",
+    note: "Revisa README, dependencias y versión de Node.js o framework antes de ejecutar el paquete.",
+  };
+  if (keys.some((key) => ["wordpress", "elementor", "woocommerce", "drupal", "joomla", "ghost", "shopify", "opencart", "prestashop"].includes(key))) return {
+    level: "setup",
+    label: "Requiere configuración",
+    shortLabel: "CMS o hosting",
+    note: "Necesita una instalación compatible, plugins o credenciales de la plataforma indicados en la ficha.",
+  };
+  if (keys.includes("fonts")) return {
+    level: "direct",
+    label: "Instalación local",
+    shortLabel: "Instalar OTF/TTF",
+    note: "Extrae el ZIP, instala el formato compatible y reinicia la aplicación de diseño si fuera necesario.",
+  };
+  if (keys.some((key) => ["fcpx", "capcut", "photoshop", "audio-editor"].includes(key))) return {
+    level: "setup",
+    label: "Requiere aplicación",
+    shortLabel: "Software compatible",
+    note: "Abre el ZIP en la aplicación indicada y confirma el formato del archivo antes de editar.",
+  };
+  return {
+    level: "direct",
+    label: "Listo para revisar",
+    shortLabel: "Extraer y abrir",
+    note: "Extrae el ZIP y comprueba sus formatos internos antes de incorporarlo a un proyecto.",
+  };
 }
 
 export function describeResource(item: CatalogItem): ResourceNarrative {
