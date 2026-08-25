@@ -40,6 +40,11 @@ export type MinimumRequirement = {
   note: string;
 };
 
+export type VersionCompatibility = {
+  label: string;
+  note: string;
+};
+
 type BaseNarrative = Omit<ResourceNarrative, "technical">;
 
 const narratives: Record<ResourceCategory, BaseNarrative> = {
@@ -224,6 +229,7 @@ export const technicalFilters = [
   { id: "shopify", label: "Shopify", note: "Tienda Shopify" },
   { id: "opencart", label: "OpenCart", note: "Tienda OpenCart" },
   { id: "prestashop", label: "PrestaShop", note: "Tienda PrestaShop" },
+  { id: "magento", label: "Magento", note: "Magento y Adobe Commerce" },
   { id: "fcpx", label: "Final Cut Pro", note: "FCPX en macOS" },
   { id: "capcut", label: "CapCut", note: "Edición CapCut" },
   { id: "photoshop", label: "Photoshop", note: "Adobe Photoshop" },
@@ -267,6 +273,42 @@ export function technicalFor(item: CatalogItem): TechnicalCompatibility {
     "Instalar WordPress, Elementor y los plugins exigidos por el kit; comprobar la versión de WooCommerce y cargar las plantillas según el README.",
     ["wordpress", "elementor", "woocommerce"],
     "Un kit Elementor no se instala como un tema HTML estático ni garantiza por sí solo pasarela de pago, hosting o licencias de imágenes."
+  );
+
+  if (source === "cursos") return web(
+    ["WordPress", "LMS / cursos online"],
+    "Hosting WordPress con PHP y base de datos; navegador para gestionar cursos, lecciones y contenido.",
+    "La configuración inicial se hace desde WordPress; CSS, PHP y JavaScript sirven para personalizaciones de tema o LMS.",
+    "Instala el tema en una copia de prueba y confirma el plugin LMS, constructor y versión de PHP requeridos dentro del ZIP antes de publicar.",
+    ["wordpress"],
+    "El nombre del tema describe su enfoque educativo, pero no confirma qué LMS, plugins premium o licencia contiene el paquete."
+  );
+
+  if (source === "inmobiliaria") return web(
+    /elementor/.test(name) ? ["WordPress", "Elementor", "Portal inmobiliario"] : ["WordPress", "Portal inmobiliario"],
+    "Hosting WordPress con PHP y base de datos; un portal de propiedades puede requerir plugins de listados, mapas o formularios.",
+    "La gestión inicial se realiza desde WordPress; CSS, PHP y JavaScript se usan para adaptar fichas, filtros, integraciones y estilo.",
+    "Instala el tema en un entorno de prueba y revisa el README para identificar plugins de propiedades, mapas, formularios y la versión de PHP requerida.",
+    ["wordpress", ...(/elementor/.test(name) ? ["elementor"] : [])],
+    "El paquete puede incluir maquetas o dependencias de directorio que no están verificadas únicamente por el nombre del archivo."
+  );
+
+  if (source === "magento ii") return web(
+    ["Magento 2", "Adobe Commerce", "PHP", "MySQL"],
+    "Servidor compatible con Magento 2, PHP y base de datos; el peso de estos paquetes recomienda instalación local o staging.",
+    "Requiere configuración de Magento, temas y dependencias; XML, PHP, PHTML, CSS, JavaScript y Composer pueden intervenir en la personalización.",
+    "Comprueba en el README la versión exacta de Magento, PHP, Adobe Commerce y módulos requeridos antes de instalar el ZIP.",
+    ["magento"],
+    "Un nombre que indica Magento 2 no confirma la revisión menor ni la compatibilidad con extensiones ya instaladas."
+  );
+
+  if (source === "shopify 1 - 10") return web(
+    ["Shopify", "Editor de temas Shopify", "Liquid"],
+    "Cuenta Shopify y navegador; no requiere hosting PHP propio para operar la tienda.",
+    "La edición cotidiana se realiza desde el editor de Shopify; Liquid, HTML, CSS y JavaScript sirven para personalizaciones avanzadas.",
+    "Sube el tema como copia no publicada, revisa theme.liquid y confirma si indica Online Store 2.0, apps requeridas y secciones compatibles.",
+    ["shopify"],
+    "La mención a Shopify u OS 2.0 en el nombre requiere validación con los archivos internos antes de reemplazar un tema activo."
   );
 
   if (source === "podcast y radio") return web(
@@ -381,7 +423,7 @@ export function minimumRequirementFor(item: CatalogItem): MinimumRequirement {
     shortLabel: "Node + proyecto",
     note: "Revisa README, dependencias y versión de Node.js o framework antes de ejecutar el paquete.",
   };
-  if (keys.some((key) => ["wordpress", "elementor", "woocommerce", "drupal", "joomla", "ghost", "shopify", "opencart", "prestashop"].includes(key))) return {
+  if (keys.some((key) => ["wordpress", "elementor", "woocommerce", "drupal", "joomla", "ghost", "shopify", "opencart", "prestashop", "magento"].includes(key))) return {
     level: "setup",
     label: "Requiere configuración",
     shortLabel: "CMS o hosting",
@@ -405,6 +447,23 @@ export function minimumRequirementFor(item: CatalogItem): MinimumRequirement {
     shortLabel: "Extraer y abrir",
     note: "Extrae el ZIP y comprueba sus formatos internos antes de incorporarlo a un proyecto.",
   };
+}
+
+export function versionCompatibilityFor(item: CatalogItem): VersionCompatibility {
+  const source = (item.sourceFolder ?? "").toLowerCase();
+  const name = `${item.name} ${item.originalName ?? ""}`.toLowerCase();
+  if (source === "shopify 1 - 10") {
+    if (/shopify.*(?:os[- ]?2[.-]?0|2[- ]?0)|(?:os[- ]?2[.-]?0).*shopify/.test(name)) {
+      return { label: "Shopify Online Store 2.0", note: "La referencia a OS 2.0 aparece en el nombre; confirma en el ZIP las secciones y apps necesarias antes de activar el tema." };
+    }
+    return { label: "Shopify · versión por confirmar", note: "Revisa config/settings_schema.json y la documentación del tema para validar su arquitectura antes de instalarlo." };
+  }
+  if (source === "magento ii") return { label: "Magento 2.x · por confirmar", note: "El nombre identifica Magento 2, pero el README debe confirmar la versión menor de Magento, PHP y Adobe Commerce." };
+  if (source === "cursos" || source === "inmobiliaria") return { label: "WordPress · por confirmar", note: "El paquete indica un tema WordPress; revisa el README para confirmar versión de WordPress, PHP, constructor y plugins." };
+  if (source === "react native") return { label: "React Native / Expo · por confirmar", note: "Abre package.json y app.json para comprobar las versiones de React Native, Expo SDK y Node.js antes de ejecutar." };
+  if (source === "plantillas elementor ecommerce" || source === "podcast y radio") return { label: "WordPress + Elementor · por confirmar", note: "Revisa el kit y sus plugins para validar la versión de WordPress, Elementor y WooCommerce requerida." };
+  if (source === "temas prestashop") return { label: "PrestaShop · por confirmar", note: "Consulta la documentación del tema para verificar la versión de PrestaShop, PHP y módulos necesarios." };
+  return { label: "Versión por confirmar", note: "El nombre del archivo no acredita una versión de software; revisa README, package.json o la documentación interna antes de instalar." };
 }
 
 export function describeResource(item: CatalogItem): ResourceNarrative {

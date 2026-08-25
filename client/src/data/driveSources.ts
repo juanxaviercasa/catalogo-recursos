@@ -36,6 +36,13 @@ export const driveSources: DriveSource[] = [
     folderUrl: "https://drive.google.com/drive/folders/11fXUqfBt3zcbl5I5EkO92BiLBgTT2xOj",
     indexedCount: 218,
   },
+  {
+    id: "latamecommerce247",
+    account: "latamecommerce247@gmail.com",
+    label: "Webs · biblioteca de temas ecommerce y CMS",
+    folderUrl: "https://drive.google.com/drive/folders/18zv26Uoyb7lUGvlPIyvbBS1Ntz2n5F5-",
+    indexedCount: 574,
+  },
 ];
 
 export const defaultDriveSource = driveSources[0];

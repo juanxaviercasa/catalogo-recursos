@@ -101,3 +101,7 @@ Un símbolo sin texto compuesto por tres pestañas superpuestas, donde la pesta�
 - Cada fuente se abre con una pausa de capítulo más visible: folio, cuenta de origen, total y banda tipográfica antes de sus registros.
 - Fraunces se reserva para identidad, capítulos, folios y totales; DM Sans ordena acciones, filtros, compatibilidades y metadatos operativos.
 - Amarillo archivo señala selección, exportación o estado activo; coral queda limitado a avisos y excepciones de descarga.
+- Las aperturas de fuente son pausas de catálogo inequívocas: folio, cuenta, total y ruta visible anteceden a cualquier registro.
+- La espina oliva `#61765B` conecta en un mismo eje la portada, el estado de ruta, las cabeceras de capítulo y los grupos de fichas.
+- Fraunces queda reservado para identidad, títulos de capítulo, folios y cifras; DM Sans organiza archivos, rutas, acciones y metadatos.
+- El amarillo archivo señala decisiones activas y folios; los acentos secundarios se reducen para que la estructura documental conserve contraste.

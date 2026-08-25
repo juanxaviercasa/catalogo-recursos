@@ -137,3 +137,10 @@
 - [x] Implementar selección persistente de recursos y acciones para crear o descargar su lista.
 - [x] Validar filtros, indicadores y selección en escritorio y móvil.
 - [x] Guardar checkpoint, publicar y sincronizar GitHub.
+- [x] Inventariar la carpeta de sitios web de latamecommerce247@gmail.com con nombres, IDs, formatos y tamaños.
+- [x] Clasificar los sitios web nuevos con títulos editoriales, casos de uso y compatibilidad técnica.
+- [x] Implementar estado manual de licencia persistente por recurso.
+- [x] Permitir crear y guardar colecciones personalizadas desde la selección actual.
+- [x] Mostrar compatibilidad por versión de CMS o framework en fichas y filtros.
+- [x] Registrar la quinta fuente y conectar su inventario al explorador de colecciones.
+- [ ] Validar en escritorio y móvil, guardar checkpoint, publicar y sincronizar GitHub.

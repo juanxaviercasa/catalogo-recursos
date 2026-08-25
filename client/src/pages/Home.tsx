@@ -59,6 +59,7 @@ import {
   matchesTechnicalFilter,
   minimumRequirementFor,
   technicalFilters,
+  versionCompatibilityFor,
   type LicenseReviewKey,
 } from "@/data/catalogNarrative";
 import {
@@ -106,6 +107,17 @@ type SavedSearch = {
   createdAt: string;
 };
 type DownloadProgress = { current: number; total: number } | null;
+type ManualLicenseStatus = "unreviewed" | "commercial-cleared" | "attribution" | "do-not-use";
+
+const manualLicenseOptions: Array<{ id: ManualLicenseStatus; label: string; note: string }> = [
+  { id: "unreviewed", label: "Sin revisar", note: "No hay una decisión manual guardada." },
+  { id: "commercial-cleared", label: "Uso comercial revisado", note: "Marcado manualmente tras revisar su licencia; conserva la evidencia fuera del catálogo." },
+  { id: "attribution", label: "Atribución o uso limitado", note: "Marcado manualmente para recordar que se debe revisar atribución, alcance o restricciones." },
+  { id: "do-not-use", label: "No usar hasta confirmar", note: "Marcado manualmente para bloquear su uso mientras se revisa la licencia." },
+];
+
+const manualLicenseOption = (status: ManualLicenseStatus) =>
+  manualLicenseOptions.find(option => option.id === status) ?? manualLicenseOptions[0];
 
 const categoryVisual = {
   "Naturaleza & flora": {
@@ -314,6 +326,14 @@ export default function Home() {
       ) as string[];
     } catch {
       return [];
+    }
+  });
+  const [manualLicenses, setManualLicenses] = useState<Record<string, ManualLicenseStatus>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      return JSON.parse(window.localStorage.getItem("indice-drive:manual-licenses") ?? "{}") as Record<string, ManualLicenseStatus>;
+    } catch {
+      return {};
     }
   });
   const [downloadProgress, setDownloadProgress] =
@@ -545,7 +565,7 @@ export default function Home() {
     sourceFilter !== "all",
     exactSizeActive,
   ].filter(Boolean).length;
-  const collectionSourceIds = compareIds.length > 0 ? compareIds : favorites;
+  const collectionSourceIds = selectionIds.length > 0 ? selectionIds : compareIds.length > 0 ? compareIds : favorites;
   const recommendationItems = useMemo(() => {
     const candidatePool = fullCatalog.filter(item => {
       if (goalFilter !== "Todo")
@@ -647,6 +667,17 @@ export default function Home() {
   useEffect(() => {
     try {
       window.localStorage.setItem(
+        "indice-drive:manual-licenses",
+        JSON.stringify(manualLicenses)
+      );
+    } catch {
+      /* El estado manual continúa vigente durante la sesión si el navegador bloquea almacenamiento. */
+    }
+  }, [manualLicenses]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
         "indice-drive:saved-searches",
         JSON.stringify(savedSearches)
       );
@@ -711,6 +742,16 @@ export default function Home() {
     setCollections(current => [collection, ...current]);
     setCollectionName("");
     setNotice(`“${name}” se guardó en este navegador.`);
+  };
+
+  const setManualLicense = (id: string, status: ManualLicenseStatus) => {
+    setManualLicenses(current => {
+      const next = { ...current };
+      if (status === "unreviewed") delete next[id];
+      else next[id] = status;
+      return next;
+    });
+    setNotice(`Estado de licencia actualizado: ${manualLicenseOption(status).label}.`);
   };
 
   const shareCollection = async (collection: SavedCollection) => {
@@ -1842,6 +1883,16 @@ export default function Home() {
                 Agregar a descargas
               </button>
               <button
+                className="selection-save-collection"
+                onClick={() => {
+                  setCollectionName(`Selección ${collections.length + 1}`);
+                  setCollectionsOpen(true);
+                }}
+              >
+                <FolderPlus size={15} />
+                Guardar colección
+              </button>
+              <button
                 className="selection-clear"
                 onClick={() => setSelectionIds([])}
               >
@@ -1966,6 +2017,8 @@ export default function Home() {
             onFavorite={() => toggleFavorite(selected.id)}
             onCart={() => toggleCart(selected.id)}
             onSelect={() => toggleSelection(selected.id)}
+            manualLicense={manualLicenses[selected.id] ?? "unreviewed"}
+            onManualLicense={(status) => setManualLicense(selected.id, status)}
             onOpen={setSelected}
           />
         ))}
@@ -2177,6 +2230,8 @@ function ResourceDrawer({
   onFavorite,
   onCart,
   onSelect,
+  manualLicense,
+  onManualLicense,
   onOpen,
 }: {
   item: CatalogItem;
@@ -2187,6 +2242,8 @@ function ResourceDrawer({
   onFavorite: () => void;
   onCart: () => void;
   onSelect: () => void;
+  manualLicense: ManualLicenseStatus;
+  onManualLicense: (status: ManualLicenseStatus) => void;
   onOpen: (item: CatalogItem) => void;
 }) {
   const driveUrl = item.isCollection
@@ -2197,6 +2254,8 @@ function ResourceDrawer({
   const source = sourceFor(item);
   const requirement = minimumRequirementFor(item);
   const license = licenseReviewFor(item);
+  const version = versionCompatibilityFor(item);
+  const manualLicenseDetail = manualLicenseOption(manualLicense);
   const related = fullCatalog
     .filter(candidate => candidate.id !== item.id)
     .map(candidate => ({
@@ -2278,11 +2337,30 @@ function ResourceDrawer({
               <span>LICENCIA</span>
               <b>{license.shortLabel}</b>
             </div>
+            <div>
+              <span>VERSIÓN</span>
+              <b>{version.label}</b>
+            </div>
           </section>
           <section className="drawer-license-note">
             <h3>Revisión antes de usar</h3>
             <p>{license.note}</p>
             <small>{requirement.note}</small>
+          </section>
+          <section className="drawer-manual-license">
+            <h3>Estado manual de licencia</h3>
+            <p>{manualLicenseDetail.note}</p>
+            <label>
+              Decisión guardada en este navegador
+              <select
+                value={manualLicense}
+                onChange={event => onManualLicense(event.target.value as ManualLicenseStatus)}
+              >
+                {manualLicenseOptions.map(option => (
+                  <option key={option.id} value={option.id}>{option.label}</option>
+                ))}
+              </select>
+            </label>
           </section>
           <section>
             <h3>Fuente de Drive</h3>
@@ -2315,6 +2393,11 @@ function ResourceDrawer({
             <div>
               <span>ANTES DE USAR</span>
               <p>{narrative.technical.requirement}</p>
+            </div>
+            <div>
+              <span>VERSIÓN / SDK</span>
+              <p>{version.label}</p>
+              <small>{version.note}</small>
             </div>
             {narrative.technical.caution && (
               <p className="technical-caution">
