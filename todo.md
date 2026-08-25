@@ -143,4 +143,4 @@
 - [x] Permitir crear y guardar colecciones personalizadas desde la selección actual.
 - [x] Mostrar compatibilidad por versión de CMS o framework en fichas y filtros.
 - [x] Registrar la quinta fuente y conectar su inventario al explorador de colecciones.
-- [ ] Validar en escritorio y móvil, guardar checkpoint, publicar y sincronizar GitHub.
+- [x] Validar en escritorio y móvil, guardar checkpoint, publicar y sincronizar GitHub.
