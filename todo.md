@@ -151,4 +151,4 @@
 - [x] Añadir paginación con selector de recursos por página, páginas directas y navegación anterior/siguiente.
 - [x] Inventariar la carpeta de latamecommerce24@gmail.com con nombres, IDs, formatos y tamaños.
 - [x] Clasificar e integrar la sexta fuente en el catálogo y explorador.
-- [ ] Validar en escritorio y móvil, guardar checkpoint, publicar y sincronizar GitHub.
+- [x] Validar en escritorio y móvil, guardar checkpoint, publicar y sincronizar GitHub.
