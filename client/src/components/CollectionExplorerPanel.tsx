@@ -17,7 +17,7 @@ type ViewMode = "list" | "image-grid";
 type RepeatMode = "off" | "all" | "one";
 type SavedPartialSelection = { id: string; name: string; collectionId: string; itemIds: string[]; createdAt: string };
 
-const inventoryUrls = ["/manus-storage/indice-drive-collections-inventory_b44bfba5.json", "/manus-storage/indice-drive-design-collection-items_b829eb3f.json", "/manus-storage/plantillas-web-1-25-inventory_9bd1377a.json", "/manus-storage/materialesrecursos53-complete-inventory_7c0fcb7c.json", "/manus-storage/juanxaviercasa-complete-inventory_d07c92bb.json", "/manus-storage/latamecommerce247-collections-inventory_29f12282.json"];
+const inventoryUrls = ["/manus-storage/indice-drive-collections-inventory_b44bfba5.json", "/manus-storage/indice-drive-design-collection-items_b829eb3f.json", "/manus-storage/plantillas-web-1-25-inventory_9bd1377a.json", "/manus-storage/materialesrecursos53-complete-inventory_7c0fcb7c.json", "/manus-storage/juanxaviercasa-complete-inventory_d07c92bb.json", "/manus-storage/latamecommerce247-collections-inventory_29f12282.json", "/manus-storage/latamecommerce24-collections-inventory_ee845368.json"];
 const imageExtensions = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "SVG", "AVIF"];
 const audioExtensions = ["MP3", "WAV", "M4A", "AAC", "OGG"];
 const directDownloadUrl = (id: string) => `https://drive.usercontent.google.com/download?id=${id}&export=download&confirm=t`;

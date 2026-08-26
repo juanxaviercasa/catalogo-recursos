@@ -144,3 +144,11 @@
 - [x] Mostrar compatibilidad por versión de CMS o framework en fichas y filtros.
 - [x] Registrar la quinta fuente y conectar su inventario al explorador de colecciones.
 - [x] Validar en escritorio y móvil, guardar checkpoint, publicar y sincronizar GitHub.
+- [x] Definir y validar el formato de importación CSV para estados manuales de licencia.
+- [x] Implementar importación de licencias CSV con resumen de filas aplicadas y rechazadas.
+- [x] Añadir estado “probado” y notas personales persistentes por recurso.
+- [x] Implementar comparativa técnica de temas y recursos con requisitos y versiones.
+- [x] Añadir paginación con selector de recursos por página, páginas directas y navegación anterior/siguiente.
+- [x] Inventariar la carpeta de latamecommerce24@gmail.com con nombres, IDs, formatos y tamaños.
+- [x] Clasificar e integrar la sexta fuente en el catálogo y explorador.
+- [ ] Validar en escritorio y móvil, guardar checkpoint, publicar y sincronizar GitHub.

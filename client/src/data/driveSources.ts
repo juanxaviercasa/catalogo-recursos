@@ -43,6 +43,13 @@ export const driveSources: DriveSource[] = [
     folderUrl: "https://drive.google.com/drive/folders/18zv26Uoyb7lUGvlPIyvbBS1Ntz2n5F5-",
     indexedCount: 574,
   },
+  {
+    id: "latamecommerce24",
+    account: "latamecommerce24@gmail.com",
+    label: "Webs · biblioteca Magento y PrestaShop",
+    folderUrl: "https://drive.google.com/drive/folders/146w-FDVINmou6ahV-l_Dsbto3fnSqQpA",
+    indexedCount: 53,
+  },
 ];
 
 export const defaultDriveSource = driveSources[0];

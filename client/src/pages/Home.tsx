@@ -1,7 +1,7 @@
 /**
  * Archivo editorial: recursos visuales de una fuente privada de Drive; el origen queda identificado por cuenta, sin exponer la jerarquía interna de carpetas.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowDownUp,
   ArrowUpRight,
@@ -9,6 +9,7 @@ import {
   Check,
   ChevronRight,
   ChevronDown,
+  ChevronLeft,
   CircleHelp,
   Columns3,
   Download,
@@ -108,6 +109,7 @@ type SavedSearch = {
 };
 type DownloadProgress = { current: number; total: number } | null;
 type ManualLicenseStatus = "unreviewed" | "commercial-cleared" | "attribution" | "do-not-use";
+type LicenseImportResult = { applied: number; rejected: number };
 
 const manualLicenseOptions: Array<{ id: ManualLicenseStatus; label: string; note: string }> = [
   { id: "unreviewed", label: "Sin revisar", note: "No hay una decisión manual guardada." },
@@ -118,6 +120,35 @@ const manualLicenseOptions: Array<{ id: ManualLicenseStatus; label: string; note
 
 const manualLicenseOption = (status: ManualLicenseStatus) =>
   manualLicenseOptions.find(option => option.id === status) ?? manualLicenseOptions[0];
+
+function parseDelimitedRow(line: string, delimiter: string) {
+  const values: string[] = [];
+  let value = "";
+  let quoted = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const character = line[index];
+    if (character === '"') {
+      if (quoted && line[index + 1] === '"') {
+        value += '"';
+        index += 1;
+      } else quoted = !quoted;
+    } else if (character === delimiter && !quoted) {
+      values.push(value.trim());
+      value = "";
+    } else value += character;
+  }
+  values.push(value.trim());
+  return values;
+}
+
+function manualLicenseStatusFrom(value: string): ManualLicenseStatus | null {
+  const normalized = normalizeSearchText(value);
+  if (["unreviewed", "sin revisar", "pendiente"].includes(normalized)) return "unreviewed";
+  if (["commercial cleared", "commercial-cleared", "uso comercial revisado", "comercial revisado"].includes(normalized)) return "commercial-cleared";
+  if (["attribution", "atribucion", "atribucion o uso limitado", "uso limitado"].includes(normalized)) return "attribution";
+  if (["do not use", "do-not-use", "no usar hasta confirmar", "bloqueado"].includes(normalized)) return "do-not-use";
+  return null;
+}
 
 const categoryVisual = {
   "Naturaleza & flora": {
@@ -240,6 +271,17 @@ function formatWeight(totalMb: number) {
   return `${Math.round(totalMb)} MB`;
 }
 
+function paginationSteps(current: number, total: number) {
+  if (total <= 7) return Array.from({ length: total }, (_, index) => index + 1);
+  const steps = new Set([1, total, current - 1, current, current + 1]);
+  if (current <= 4) [2, 3, 4, 5].forEach(step => steps.add(step));
+  if (current >= total - 3)
+    [total - 4, total - 3, total - 2, total - 1].forEach(step => steps.add(step));
+  return Array.from(steps)
+    .filter(step => step >= 1 && step <= total)
+    .sort((left, right) => left - right);
+}
+
 function normalizeSearchText(value: string) {
   return value
     .normalize("NFD")
@@ -336,6 +378,30 @@ export default function Home() {
       return {};
     }
   });
+  const [testedResourceIds, setTestedResourceIds] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      return JSON.parse(window.localStorage.getItem("indice-drive:tested-resources") ?? "[]") as string[];
+    } catch {
+      return [];
+    }
+  });
+  const [personalNotes, setPersonalNotes] = useState<Record<string, string>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      return JSON.parse(window.localStorage.getItem("indice-drive:personal-notes") ?? "{}") as Record<string, string>;
+    } catch {
+      return {};
+    }
+  });
+  const [itemsPerPage, setItemsPerPage] = useState(() => {
+    if (typeof window === "undefined") return 24;
+    const stored = Number(window.localStorage.getItem("indice-drive:items-per-page"));
+    return [12, 24, 48, 96].includes(stored) ? stored : 24;
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const licenseCsvInputRef = useRef<HTMLInputElement>(null);
+  const [lastLicenseImport, setLastLicenseImport] = useState<LicenseImportResult | null>(null);
   const [downloadProgress, setDownloadProgress] =
     useState<DownloadProgress>(null);
   const [exportOpen, setExportOpen] = useState(false);
@@ -473,14 +539,21 @@ export default function Home() {
     favorites,
   ]);
 
+  const totalPages = Math.max(1, Math.ceil(resources.length / itemsPerPage));
+  const paginatedResources = useMemo(() => {
+    const safePage = Math.min(currentPage, totalPages);
+    const start = (safePage - 1) * itemsPerPage;
+    return resources.slice(start, start + itemsPerPage);
+  }, [resources, itemsPerPage, currentPage, totalPages]);
+
   const groupedResources = useMemo<[string, CatalogItem[]][]>(() => {
     return driveSources
       .map((source, index): [string, CatalogItem[]] => [
         `Fuente ${String(index + 1).padStart(2, "0")} · ${source.account}`,
-        resources.filter(item => sourceFor(item).id === source.id),
+        paginatedResources.filter(item => sourceFor(item).id === source.id),
       ])
       .filter(([, items]) => items.length > 0);
-  }, [resources]);
+  }, [paginatedResources]);
 
   const categoryCount = (category: Filter) =>
     category === "Todo"
@@ -678,6 +751,60 @@ export default function Home() {
   useEffect(() => {
     try {
       window.localStorage.setItem(
+        "indice-drive:tested-resources",
+        JSON.stringify(testedResourceIds)
+      );
+    } catch {
+      /* El sello probado se conserva durante la sesión si el navegador bloquea almacenamiento. */
+    }
+  }, [testedResourceIds]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        "indice-drive:personal-notes",
+        JSON.stringify(personalNotes)
+      );
+    } catch {
+      /* Las notas siguen visibles durante la sesión si el navegador bloquea almacenamiento. */
+    }
+  }, [personalNotes]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("indice-drive:items-per-page", String(itemsPerPage));
+    } catch {
+      /* La página actual conserva la cantidad elegida durante la sesión. */
+    }
+  }, [itemsPerPage]);
+
+  useEffect(() => {
+    setCurrentPage(page => Math.min(Math.max(1, page), totalPages));
+  }, [totalPages]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    filter,
+    goalFilter,
+    technicalFilter,
+    licenseFilter,
+    sizeFilter,
+    query,
+    searchScope,
+    searchMatch,
+    sourceFilter,
+    sortBy,
+    minSize,
+    maxSize,
+    activeTag,
+    showFavorites,
+    itemsPerPage,
+  ]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
         "indice-drive:saved-searches",
         JSON.stringify(savedSearches)
       );
@@ -752,6 +879,73 @@ export default function Home() {
       return next;
     });
     setNotice(`Estado de licencia actualizado: ${manualLicenseOption(status).label}.`);
+  };
+
+  const toggleTested = (id: string) => {
+    setTestedResourceIds(current =>
+      current.includes(id)
+        ? current.filter(resourceId => resourceId !== id)
+        : [...current, id]
+    );
+  };
+
+  const setPersonalNote = (id: string, note: string) => {
+    setPersonalNotes(current => {
+      const next = { ...current };
+      if (note.trim()) next[id] = note.slice(0, 800);
+      else delete next[id];
+      return next;
+    });
+  };
+
+  const importLicenseCsv = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const lines = (await file.text())
+        .replace(/^\uFEFF/, "")
+        .split(/\r?\n/)
+        .filter(line => line.trim());
+      if (lines.length < 2) throw new Error("El CSV necesita una cabecera y al menos una fila.");
+      const delimiter = lines[0].includes(";") ? ";" : ",";
+      const headers = parseDelimitedRow(lines[0], delimiter).map(normalizeSearchText);
+      const idIndex = headers.findIndex(header => ["id", "drive id", "id drive", "recurso id"].includes(header));
+      const statusIndex = headers.findIndex(header => ["estado", "estado licencia", "licencia", "license status"].includes(header));
+      if (idIndex < 0 || statusIndex < 0) {
+        throw new Error("El CSV debe incluir las columnas ID y Estado.");
+      }
+      const updates: Record<string, ManualLicenseStatus> = {};
+      let applied = 0;
+      let rejected = 0;
+      lines.slice(1).forEach(line => {
+        const values = parseDelimitedRow(line, delimiter);
+        const id = values[idIndex]?.trim();
+        const status = manualLicenseStatusFrom(values[statusIndex] ?? "");
+        if (!id || !status || !fullCatalog.some(item => item.id === id)) {
+          rejected += 1;
+          return;
+        }
+        if (status === "unreviewed") delete updates[id];
+        else updates[id] = status;
+        applied += 1;
+      });
+      setManualLicenses(current => ({ ...current, ...updates }));
+      setLastLicenseImport({ applied, rejected });
+      setNotice(`Licencias importadas: ${applied} aplicadas${rejected ? ` · ${rejected} sin coincidencia o con estado inválido` : ""}.`);
+    } catch (error) {
+      setLastLicenseImport(null);
+      setNotice(error instanceof Error ? error.message : "No se pudo importar el archivo CSV.");
+    } finally {
+      event.target.value = "";
+    }
+  };
+
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.min(Math.max(1, page), totalPages));
+    window.setTimeout(
+      () => document.getElementById("catalogo")?.scrollIntoView({ behavior: "smooth", block: "start" }),
+      0
+    );
   };
 
   const shareCollection = async (collection: SavedCollection) => {
@@ -1630,6 +1824,26 @@ export default function Home() {
                   </button>
                 )}
               </div>
+              <div className="license-import" aria-label="Importar estados de licencia">
+                <input
+                  ref={licenseCsvInputRef}
+                  type="file"
+                  accept=".csv,text/csv"
+                  onChange={importLicenseCsv}
+                  hidden
+                />
+                <div>
+                  <span>LICENCIAS MASIVAS</span>
+                  <b>Importa decisiones desde CSV</b>
+                  <small>Columnas requeridas: <code>ID</code> y <code>Estado</code>.</small>
+                </div>
+                <button onClick={() => licenseCsvInputRef.current?.click()}>
+                  <FileArchive size={15} /> Importar CSV
+                </button>
+                {lastLicenseImport && (
+                  <em>{lastLicenseImport.applied} filas aplicadas · {lastLicenseImport.rejected} rechazadas</em>
+                )}
+              </div>
               <div className="size-rail">
                 <div>
                   <span>Tamaño de archivo</span>
@@ -1826,6 +2040,46 @@ export default function Home() {
               </div>
             </div>
           </div>
+          {resources.length > 0 && (
+            <nav className="catalog-pagination" aria-label="Paginación del catálogo">
+              <div className="pagination-summary">
+                <span>LECTURA POR PÁGINAS</span>
+                <b>
+                  Mostrando {Math.min((currentPage - 1) * itemsPerPage + 1, resources.length)}–{Math.min(currentPage * itemsPerPage, resources.length)} de {resources.length}
+                </b>
+              </div>
+              <label className="pagination-size-control">
+                <span>Por página</span>
+                <select value={itemsPerPage} onChange={event => setItemsPerPage(Number(event.target.value))}>
+                  <option value={12}>12 registros</option>
+                  <option value={24}>24 registros</option>
+                  <option value={48}>48 registros</option>
+                  <option value={96}>96 registros</option>
+                </select>
+              </label>
+              <div className="pagination-pages">
+                <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1} aria-label="Página anterior">
+                  <ChevronLeft size={16} /> Anterior
+                </button>
+                {paginationSteps(currentPage, totalPages).map((page, index, pages) => (
+                  <span key={page} className="pagination-page-wrap">
+                    {index > 0 && page - pages[index - 1] > 1 && <i aria-hidden="true">…</i>}
+                    <button
+                      className={page === currentPage ? "pagination-page pagination-page--active" : "pagination-page"}
+                      onClick={() => goToPage(page)}
+                      aria-current={page === currentPage ? "page" : undefined}
+                    >
+                      {page}
+                    </button>
+                  </span>
+                ))}
+                <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages} aria-label="Página siguiente">
+                  Siguiente <ChevronRight size={16} />
+                </button>
+              </div>
+              <span className="pagination-folio">PÁGINA {currentPage} / {totalPages}</span>
+            </nav>
+          )}
           {notice && (
             <div className="catalog-notice" role="status">
               <span>{notice}</span>
@@ -1959,10 +2213,12 @@ export default function Home() {
                       comparisonSelected={compareIds.includes(item.id)}
                       cartSelected={cartIds.includes(item.id)}
                       selected={selectionIds.includes(item.id)}
+                      tested={testedResourceIds.includes(item.id)}
                       onFavorite={() => toggleFavorite(item.id)}
                       onCompare={() => toggleCompare(item.id)}
                       onCart={() => toggleCart(item.id)}
                       onSelect={() => toggleSelection(item.id)}
+                      onToggleTested={() => toggleTested(item.id)}
                       onOpen={() => setSelected(item)}
                     />
                   ))}
@@ -2019,6 +2275,10 @@ export default function Home() {
             onSelect={() => toggleSelection(selected.id)}
             manualLicense={manualLicenses[selected.id] ?? "unreviewed"}
             onManualLicense={(status) => setManualLicense(selected.id, status)}
+            tested={testedResourceIds.includes(selected.id)}
+            personalNote={personalNotes[selected.id] ?? ""}
+            onToggleTested={() => toggleTested(selected.id)}
+            onPersonalNoteChange={note => setPersonalNote(selected.id, note)}
             onOpen={setSelected}
           />
         ))}
@@ -2074,10 +2334,12 @@ function ResourceCard({
   comparisonSelected,
   cartSelected,
   selected,
+  tested,
   onFavorite,
   onCompare,
   onCart,
   onSelect,
+  onToggleTested,
   onOpen,
 }: {
   item: CatalogItem;
@@ -2086,10 +2348,12 @@ function ResourceCard({
   comparisonSelected: boolean;
   cartSelected: boolean;
   selected: boolean;
+  tested: boolean;
   onFavorite: () => void;
   onCompare: () => void;
   onCart: () => void;
   onSelect: () => void;
+  onToggleTested: () => void;
   onOpen: () => void;
 }) {
   const narrative = describeResource(item);
@@ -2105,9 +2369,10 @@ function ResourceCard({
       <div className="record-strip">
         <BrandMark className="card-mark" />
         <span>FUENTE DRIVE · {source.account}</span>
-        <b>
-          {item.isCollection ? "COLECCIÓN" : "ZIP"} · {item.size}
-        </b>
+          <b>
+            {item.isCollection ? "COLECCIÓN" : "ZIP"} · {item.size}
+          </b>
+          {tested && <i className="tested-stamp"><Check size={11} /> PROBADO</i>}
       </div>
       <div className="resource-content">
         <div className="resource-line">
@@ -2201,6 +2466,12 @@ function ResourceCard({
             <Check size={15} />
             {selected ? "Seleccionado" : "Seleccionar"}
           </button>
+          <button
+            className={tested ? "resource-tested resource-tested--active" : "resource-tested"}
+            onClick={onToggleTested}
+          >
+            <Check size={15} /> {tested ? "Probado" : "Marcar probado"}
+          </button>
           <a className="resource-download" href={downloadUrl}>
             <Download size={15} />
             {item.isCollection ? "Descargar colección" : "Descargar ZIP"}
@@ -2232,6 +2503,10 @@ function ResourceDrawer({
   onSelect,
   manualLicense,
   onManualLicense,
+  tested,
+  personalNote,
+  onToggleTested,
+  onPersonalNoteChange,
   onOpen,
 }: {
   item: CatalogItem;
@@ -2244,6 +2519,10 @@ function ResourceDrawer({
   onSelect: () => void;
   manualLicense: ManualLicenseStatus;
   onManualLicense: (status: ManualLicenseStatus) => void;
+  tested: boolean;
+  personalNote: string;
+  onToggleTested: () => void;
+  onPersonalNoteChange: (note: string) => void;
   onOpen: (item: CatalogItem) => void;
 }) {
   const driveUrl = item.isCollection
@@ -2360,6 +2639,25 @@ function ResourceDrawer({
                   <option key={option.id} value={option.id}>{option.label}</option>
                 ))}
               </select>
+            </label>
+          </section>
+          <section className="drawer-personal-log">
+            <h3>Prueba y notas personales</h3>
+            <p>Registra una validación propia o el detalle que necesitas recordar al volver a este recurso.</p>
+            <button
+              className={tested ? "personal-tested personal-tested--active" : "personal-tested"}
+              onClick={onToggleTested}
+            >
+              <Check size={16} /> {tested ? "Probado en tu flujo" : "Marcar como probado"}
+            </button>
+            <label>
+              Nota privada en este navegador
+              <textarea
+                value={personalNote}
+                onChange={event => onPersonalNoteChange(event.target.value)}
+                placeholder="Ej. Revisado con Shopify 2.0; falta confirmar la licencia del plugin incluido."
+                maxLength={800}
+              />
             </label>
           </section>
           <section>
@@ -2590,6 +2888,14 @@ function ComparisonPanel({
                   <div>
                     <dt>Requiere</dt>
                     <dd>{narrative.technical.requirement}</dd>
+                  </div>
+                  <div>
+                    <dt>Versión / SDK</dt>
+                    <dd>{versionCompatibilityFor(item).label}</dd>
+                  </div>
+                  <div>
+                    <dt>Fuente</dt>
+                    <dd>{sourceFor(item).account}</dd>
                   </div>
                   <div>
                     <dt>Ideal cuando</dt>

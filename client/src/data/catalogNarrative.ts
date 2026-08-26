@@ -293,7 +293,7 @@ export function technicalFor(item: CatalogItem): TechnicalCompatibility {
     "El paquete puede incluir maquetas o dependencias de directorio que no están verificadas únicamente por el nombre del archivo."
   );
 
-  if (source === "magento ii") return web(
+  if (source === "magento ii" || source === "magento") return web(
     ["Magento 2", "Adobe Commerce", "PHP", "MySQL"],
     "Servidor compatible con Magento 2, PHP y base de datos; el peso de estos paquetes recomienda instalación local o staging.",
     "Requiere configuración de Magento, temas y dependencias; XML, PHP, PHTML, CSS, JavaScript y Composer pueden intervenir en la personalización.",
@@ -352,7 +352,7 @@ export function technicalFor(item: CatalogItem): TechnicalCompatibility {
   if (source === "diapositivas de matematicas" || source === "google slides") return web(["Google Slides", "Microsoft PowerPoint", "Apple Keynote", "Canva"], "Navegador, Windows o macOS", "No requiere código; edita textos, gráficas, colores e imágenes en el software de presentaciones compatible.", "Extraer el ZIP y verificar si incluye formato para Google Slides, PowerPoint o Keynote antes de editar.", ["design-tools"], "No todas las plantillas se abren de forma nativa en el mismo programa; confirma el formato de cada archivo.");
   if (source === "logo y email" || source === "math graphic templates") return web(["Figma", "Adobe Illustrator", "Adobe Photoshop", "Canva", "Editor de email"], "Navegador, Windows o macOS", "No requiere código para la edición visual; una plantilla de email puede requerir HTML para ajustes avanzados.", "Extraer el ZIP y revisar si contiene SVG, AI, PSD, PNG o HTML para elegir la aplicación adecuada.", ["design-tools"], "La colección combina recursos de branding, interfaces y comunicación; comprueba los archivos internos antes de editarlos.");
   if (source === "plantillas web de figma") return web(["Figma", "FigJam", "Editor de código"], "Navegador, Windows o macOS", "No requiere código para prototipar; HTML, CSS y JavaScript se utilizan si se implementa el diseño en producción.", "Abrir el recurso en Figma y revisar estilos, componentes y exportables antes de entregarlo a desarrollo.", ["design-tools"], "Estas son interfaces de diseño: no se convierten automáticamente en un sitio funcional sin implementación técnica.");
-  if (source === "temas prestashop") return web(["PrestaShop", "Editor de temas PrestaShop"], "Navegador + hosting con PHP y base de datos compatible con PrestaShop", "La personalización básica se hace desde PrestaShop; Smarty, PHP, CSS y JavaScript se usan para ajustes avanzados.", "Revisar el ZIP para confirmar la versión de PrestaShop, módulos requeridos e instrucciones de instalación.", ["prestashop"], "No funciona como tema de Shopify, WordPress o WooCommerce sin una migración o desarrollo específico.");
+  if (source === "temas prestashop" || source === "prestashop (3)") return web(["PrestaShop", "Editor de temas PrestaShop"], "Navegador + hosting con PHP y base de datos compatible con PrestaShop", "La personalización básica se hace desde PrestaShop; Smarty, PHP, CSS y JavaScript se usan para ajustes avanzados.", "Revisar el ZIP para confirmar la versión de PrestaShop, módulos requeridos e instrucciones de instalación.", ["prestashop"], "No funciona como tema de Shopify, WordPress o WooCommerce sin una migración o desarrollo específico.");
 
   if (source === "diseño web") {
     if (/plugins/.test(name)) return web(["WordPress", "WooCommerce", "Elementor"], "Navegador + hosting WordPress compatible", "No requiere código para instalar y configurar lo básico; PHP, CSS y JavaScript solo para personalizaciones avanzadas.", "Necesitas un sitio WordPress activo; las extensiones de tienda requieren WooCommerce y las de diseño visual requieren Elementor cuando el plugin lo indique.", ["wordpress", "woocommerce"], "No todos los plugins sirven para cualquier versión de WordPress: revisa compatibilidad, licencia y requisitos de cada ZIP antes de instalarlos.");
@@ -459,10 +459,11 @@ export function versionCompatibilityFor(item: CatalogItem): VersionCompatibility
     return { label: "Shopify · versión por confirmar", note: "Revisa config/settings_schema.json y la documentación del tema para validar su arquitectura antes de instalarlo." };
   }
   if (source === "magento ii") return { label: "Magento 2.x · por confirmar", note: "El nombre identifica Magento 2, pero el README debe confirmar la versión menor de Magento, PHP y Adobe Commerce." };
+  if (source === "magento") return { label: /magento[- ]?2/.test(name) ? "Magento 2.x · por confirmar" : "Magento / Adobe Commerce · por confirmar", note: "El nombre del paquete orienta a Magento, pero el README debe confirmar la versión de Magento, PHP, Adobe Commerce y módulos requeridos." };
   if (source === "cursos" || source === "inmobiliaria") return { label: "WordPress · por confirmar", note: "El paquete indica un tema WordPress; revisa el README para confirmar versión de WordPress, PHP, constructor y plugins." };
   if (source === "react native") return { label: "React Native / Expo · por confirmar", note: "Abre package.json y app.json para comprobar las versiones de React Native, Expo SDK y Node.js antes de ejecutar." };
   if (source === "plantillas elementor ecommerce" || source === "podcast y radio") return { label: "WordPress + Elementor · por confirmar", note: "Revisa el kit y sus plugins para validar la versión de WordPress, Elementor y WooCommerce requerida." };
-  if (source === "temas prestashop") return { label: "PrestaShop · por confirmar", note: "Consulta la documentación del tema para verificar la versión de PrestaShop, PHP y módulos necesarios." };
+  if (source === "temas prestashop" || source === "prestashop (3)") return { label: "PrestaShop · por confirmar", note: "Consulta la documentación del tema para verificar la versión de PrestaShop, PHP y módulos necesarios." };
   return { label: "Versión por confirmar", note: "El nombre del archivo no acredita una versión de software; revisa README, package.json o la documentación interna antes de instalar." };
 }
 
