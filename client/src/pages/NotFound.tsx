@@ -7,39 +7,41 @@ export default function NotFound() {
   const [, setLocation] = useLocation();
 
   const handleGoHome = () => {
-    setLocation("/");
+    if (typeof window !== "undefined" && window.location.pathname.startsWith("/catalogo-recursos")) {
+      window.location.href = "/catalogo-recursos/";
+    } else {
+      setLocation("/");
+    }
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
-      <Card className="w-full max-w-lg mx-4 shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#f4f0e7]">
+      <Card className="w-full max-w-lg mx-4 shadow-lg border border-[#d8d0c1] bg-[#fffdf8]">
         <CardContent className="pt-8 pb-8 text-center">
           <div className="flex justify-center mb-6">
             <div className="relative">
-              <div className="absolute inset-0 bg-red-100 rounded-full animate-pulse" />
-              <AlertCircle className="relative h-16 w-16 text-red-500" />
+              <div className="absolute inset-0 bg-[#e6eddf] rounded-full animate-pulse" />
+              <AlertCircle className="relative h-16 w-16 text-[#61765b]" />
             </div>
           </div>
 
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">404</h1>
+          <h1 className="text-4xl font-bold text-[#18242e] mb-2 font-serif">404</h1>
 
-          <h2 className="text-xl font-semibold text-slate-700 mb-4">
-            Page Not Found
+          <h2 className="text-xl font-semibold text-[#36413d] mb-4">
+            Página No Encontrada
           </h2>
 
-          <p className="text-slate-600 mb-8 leading-relaxed">
-            Sorry, the page you are looking for doesn't exist.
-            <br />
-            It may have been moved or deleted.
+          <p className="text-[#5e665f] mb-8 leading-relaxed text-sm">
+            El recurso o la página que buscas no existe o ha sido movida.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button
               onClick={handleGoHome}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+              className="bg-[#61765b] hover:bg-[#4d6349] text-[#fffdf8] px-6 py-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg font-medium"
             >
               <Home className="w-4 h-4 mr-2" />
-              Go Home
+              Ir al Catálogo
             </Button>
           </div>
         </CardContent>
