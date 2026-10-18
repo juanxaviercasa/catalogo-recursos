@@ -17,7 +17,13 @@ type ViewMode = "list" | "image-grid";
 type RepeatMode = "off" | "all" | "one";
 type SavedPartialSelection = { id: string; name: string; collectionId: string; itemIds: string[]; createdAt: string };
 
-const inventoryUrls = ["/manus-storage/indice-drive-collections-inventory_b44bfba5.json", "/manus-storage/indice-drive-design-collection-items_b829eb3f.json", "/manus-storage/plantillas-web-1-25-inventory_9bd1377a.json", "/manus-storage/materialesrecursos53-complete-inventory_7c0fcb7c.json", "/manus-storage/juanxaviercasa-complete-inventory_d07c92bb.json", "/manus-storage/latamecommerce247-collections-inventory_29f12282.json", "/manus-storage/latamecommerce24-collections-inventory_ee845368.json"];
+const inventoryUrls = [
+  "./data/plantillas-web-1-25-inventory.json",
+  "./data/materialesrecursos53-complete-inventory.json",
+  "./data/juanxaviercasa-complete-inventory.json",
+  "./data/latamecommerce247-collections-inventory.json",
+  "./data/latamecommerce24-collections-inventory.json"
+];
 const imageExtensions = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "SVG", "AVIF"];
 const audioExtensions = ["MP3", "WAV", "M4A", "AAC", "OGG"];
 const directDownloadUrl = (id: string) => `https://drive.usercontent.google.com/download?id=${id}&export=download&confirm=t`;
@@ -75,7 +81,38 @@ function MediaPreviewDialog({ entry, onDismiss }: { entry: InventoryEntry | null
 
 export function CollectionExplorerPanel({ item, onClose }: { item: CatalogItem; onClose: () => void }) {
   const [allCollections, setAllCollections] = useState<InventoryCollection[] | null>(null); const [loadError, setLoadError] = useState(""); const [query, setQuery] = useState(""); const [extensionFilter, setExtensionFilter] = useState("Todo"); const [itemSizeFilter, setItemSizeFilter] = useState<ItemSizeFilter>("Todo"); const [sortBy, setSortBy] = useState<SortOption>("default"); const [viewMode, setViewMode] = useState<ViewMode>("list"); const [previewEntry, setPreviewEntry] = useState<InventoryEntry | null>(null); const [slideshowOpen, setSlideshowOpen] = useState(false); const [audioQueueOpen, setAudioQueueOpen] = useState(false); const [selectedIds, setSelectedIds] = useState<string[]>([]); const [selectionName, setSelectionName] = useState(""); const [extensionCollectionName, setExtensionCollectionName] = useState(""); const [manualTagInput, setManualTagInput] = useState(""); const [manualTags, setManualTags] = useState<Record<string, string[]>>(() => { if (typeof window === "undefined") return {}; try { return JSON.parse(window.localStorage.getItem("indice-drive:manual-tags") ?? "{}") as Record<string, string[]>; } catch { return {}; } }); const [savedSelections, setSavedSelections] = useState<SavedPartialSelection[]>(() => { if (typeof window === "undefined") return []; try { return JSON.parse(window.localStorage.getItem("indice-drive:partial-selections") ?? "[]") as SavedPartialSelection[]; } catch { return []; } }); const [downloadProgress, setDownloadProgress] = useState<{ current: number; total: number } | null>(null); const narrative = describeResource(item);
-  useEffect(() => { let active = true; Promise.all(inventoryUrls.map((url) => fetch(url).then((response) => { if (!response.ok) throw new Error(); return response.json() as Promise<InventoryCollection[]>; }))).then((sources) => { if (active) setAllCollections(sources.flat()); }).catch(() => { if (active) setLoadError("El inventario no está disponible ahora. Aun así puedes descargar la colección completa desde Drive."); }); return () => { active = false; }; }, []);
+  useEffect(() => {
+    let active = true;
+    Promise.allSettled(
+      inventoryUrls.map((url) =>
+        fetch(url).then((response) => {
+          if (!response.ok) throw new Error();
+          return response.json() as Promise<InventoryCollection[]>;
+        })
+      )
+    )
+      .then((results) => {
+        if (!active) return;
+        const sources: InventoryCollection[] = [];
+        for (const res of results) {
+          if (res.status === "fulfilled" && Array.isArray(res.value)) {
+            sources.push(...res.value);
+          }
+        }
+        if (sources.length > 0) {
+          setAllCollections(sources);
+          setLoadError("");
+        } else {
+          setLoadError("El inventario no está disponible ahora. Aun así puedes descargar la colección completa desde Drive.");
+        }
+      })
+      .catch(() => {
+        if (active) setLoadError("El inventario no está disponible ahora. Aun así puedes descargar la colección completa desde Drive.");
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
   useEffect(() => { try { window.localStorage.setItem("indice-drive:partial-selections", JSON.stringify(savedSelections)); } catch { /* Mantiene la selección durante esta sesión si el navegador bloquea almacenamiento. */ } }, [savedSelections]); useEffect(() => { try { window.localStorage.setItem("indice-drive:manual-tags", JSON.stringify(manualTags)); } catch { /* Mantiene las etiquetas durante esta sesión si el navegador bloquea almacenamiento. */ } }, [manualTags]); useEffect(() => { if (!imageExtensions.includes(extensionFilter)) { setViewMode("list"); setSlideshowOpen(false); } }, [extensionFilter]);
   const collection = allCollections?.find((candidate) => candidate.id === item.id); const entries = collection?.entries ?? []; const extensions = useMemo(() => Array.from(new Set(entries.map(entryExtension))).sort((left, right) => left.localeCompare(right, "es")), [entries]); const previewableCount = useMemo(() => entries.filter((entry) => mediaPreviewKind(entry)).length, [entries]); const visibleEntries = useMemo(() => { const term = query.trim().toLowerCase(); const filtered = entries.filter((entry) => (!term || entry.name.toLowerCase().includes(term)) && (extensionFilter === "Todo" || entryExtension(entry) === extensionFilter) && (itemSizeFilter === "Todo" || itemSizeBucket(entry) === itemSizeFilter)); const compareText = (left: string, right: string) => left.localeCompare(right, "es", { numeric: true, sensitivity: "base" }); return filtered.slice().sort((left, right) => sortBy === "name-asc" ? compareText(left.name, right.name) : sortBy === "name-desc" ? compareText(right.name, left.name) : sortBy === "size-asc" ? sizeToMb(left.size) - sizeToMb(right.size) : sortBy === "size-desc" ? sizeToMb(right.size) - sizeToMb(left.size) : sortBy === "format" ? compareText(entryExtension(left), entryExtension(right)) || compareText(left.name, right.name) : entries.indexOf(left) - entries.indexOf(right)); }, [entries, extensionFilter, itemSizeFilter, query, sortBy]);
   const selectedEntries = entries.filter((entry) => selectedIds.includes(entry.id)); const selectedAudio = selectedEntries.filter(isAudio); const selectedWeight = selectedEntries.reduce((sum, entry) => sum + sizeToMb(entry.size), 0); const allVisibleSelected = visibleEntries.length > 0 && visibleEntries.every((entry) => selectedIds.includes(entry.id)); const collectionSavedSelections = savedSelections.filter((selection) => selection.collectionId === item.id); const canUseImageGrid = imageExtensions.includes(extensionFilter) && visibleEntries.length > 0;

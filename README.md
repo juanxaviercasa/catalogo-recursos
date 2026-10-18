@@ -1,41 +1,32 @@
-# 🗂️ Catálogo de Recursos para Desarrolladores
+# 🗂️ Catálogo y Biblioteca de Recursos
 
-> **Directorio interactivo y catálogo curado de recursos de desarrollo web y herramientas de software.**
+> **Aplicación web interactiva para explorar, filtrar y descargar recursos curados de desarrollo web, diseño gráfico, plantillas y herramientas desde Google Drive.**
 
-![Categoría](https://img.shields.io/badge/Categoría-Desarrollo%20Web%20&%20Herramientas-6366F1?style=flat-square)
-![Autor](https://img.shields.io/badge/Autor-Xavier%20Cabello-0284C7?style=flat-square)
-![License](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)
-
----
-
-## 🎯 Descripción del Proyecto
-
-**catalogo-recursos** forma parte del ecosistema de productos y herramientas desarrolladas por **Juan Xavier Cabello**. Este proyecto aborda necesidades concretas en el área de **Desarrollo Web & Herramientas**, combinando estándares modernos de ingeniería de software, arquitectura limpia y documentación técnica.
+[![GitHub Pages](https://img.shields.io/badge/Deploy-GitHub%20Pages-success?style=flat-square)](https://juanxaviercasa.github.io/catalogo-recursos/)
+[![License](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)](LICENSE)
 
 ---
 
-## ✨ Características Principales
+## 🎯 Propósito de la Aplicación
 
-- ⚡ **Rendimiento y Optimización**: Construido siguiendo las mejores prácticas de desarrollo web contemporáneo.
-- 🧩 **Arquitectura Modular**: Separación estricta de responsabilidades para facilitar el mantenimiento y la escalabilidad.
-- 📱 **Diseño Responsivo**: Interfaz fluida adaptable a dispositivos móviles y pantallas de escritorio.
-- 🛡️ **Tipado y Calidad de Código**: Código estructurado con atención a la estabilidad y mantenibilidad.
+**Índice Drive / Catálogo de Recursos** es una aplicación web interactiva que funciona como biblioteca centralizada para acceder, previsualizar y descargar recursos organizados por categorías:
+
+- 🎨 **Diseño Gráfico & 3D**: Modelado 3D, personajes, renders y texturas.
+- 🎬 **Video & Motion**: Paquetes de edición para CapCut, FCPX, transiciones y efectos.
+- 🖼️ **Mockups & Plantillas**: Archivos PSD, kits de identidad y plantillas editoriales.
+- 🎵 **Audio & Música**: Pistas organizadas por estado de ánimo con reproductor y playlists integradas.
+- 🌐 **Sitios Web & Plantillas**: Temas y plantillas para WordPress/Elementor, Shopify, Magento y HTML.
+- 🔤 **Tipografías & Iconos**: Familias tipográficas e iconos listos para producción.
 
 ---
 
-## 🚀 Inicio Rápido
+## ✨ Funcionalidades
 
-```bash
-# 1. Clonar el repositorio
-git clone https://github.com/juanxaviercasa/catalogo-recursos.git
-cd catalogo-recursos
-
-# 2. Instalar dependencias (si aplica)
-npm install # o bien pip install -r requirements.txt
-
-# 3. Ejecutar en entorno local
-npm run dev # o bien python -m http.server 8000
-```
+- 🔍 **Buscador Avanzado y Filtros**: Filtrado por objetivo de proyecto, formato, tamaño de archivo, CMS y frameworks compatibles.
+- 📂 **Explorador de Colecciones de Drive**: Inspección de contenidos reales dentro de cada carpeta compartida con descargas individuales o en lote.
+- 👁️ **Visor Contextual**: Previsualización directa de miniaturas, imágenes, audio y vídeo.
+- 💾 **Persistencia Local**: Guardado de colecciones personalizadas, favoritos, etiquetas y notas sin necesidad de backend externo.
+- 🚀 **Despliegue Estático**: Compilación con Vite y React optimizada para GitHub Pages y Vercel.
 
 ---
 
