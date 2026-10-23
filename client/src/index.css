@@ -1182,31 +1182,22 @@ button:not(:disabled), a[href] { cursor: pointer; }
   gap: 14px;
 }
 
-/* Nivel 1: Pestañas de categoría horizontales */
+/* Nivel 1: Categorías responsivas con envoltura fluida (sin barras de scroll) */
 .modular-categories {
   display: flex;
   align-items: center;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: thin;
-  -webkit-overflow-scrolling: touch;
-}
-
-.modular-categories::-webkit-scrollbar {
-  height: 4px;
-}
-
-.modular-categories::-webkit-scrollbar-thumb {
-  background: #c8d7c4;
-  border-radius: 4px;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  overflow: visible;
+  padding: 0;
+  width: 100%;
 }
 
 .modular-category-chip {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 14px;
+  padding: 7px 13px;
   background: #f4f6ef;
   border: 1px solid #c9d5c4;
   border-radius: 20px;
@@ -1217,7 +1208,7 @@ button:not(:disabled), a[href] { cursor: pointer; }
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
-  flex-shrink: 0;
+  user-select: none;
 }
 
 .modular-category-chip:hover {
@@ -1566,6 +1557,13 @@ button:not(:disabled), a[href] { cursor: pointer; }
     padding: 12px 14px;
     gap: 12px;
   }
+  .modular-categories {
+    gap: 6px 8px;
+  }
+  .modular-category-chip {
+    padding: 6px 11px;
+    font-size: 11.5px;
+  }
   .modular-dropdowns-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1587,6 +1585,13 @@ button:not(:disabled), a[href] { cursor: pointer; }
 }
 
 @media (max-width: 480px) {
+  .modular-categories {
+    gap: 5px 6px;
+  }
+  .modular-category-chip {
+    padding: 5px 9px;
+    font-size: 11px;
+  }
   .modular-dropdowns-row {
     grid-template-columns: 1fr;
   }
