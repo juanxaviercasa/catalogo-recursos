@@ -2,7 +2,7 @@
 
 > **Aplicación web interactiva para explorar, filtrar y descargar recursos curados de desarrollo web, diseño gráfico, plantillas y herramientas desde Google Drive.**
 
-[![GitHub Pages](https://img.shields.io/badge/Deploy-GitHub%20Pages-success?style=flat-square)](https://juanxaviercasa.github.io/catalogo-recursos/)
+[![GitHub Pages](https://img.shields.io/badge/Deploy-GitHub%20Pages-success?style=flat-square)](https://files.sistemazenit.com/)
 [![License](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)](LICENSE)
 
 ---
