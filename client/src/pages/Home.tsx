@@ -1281,7 +1281,7 @@ export default function Home() {
             <div className="cover-brandline">
               <BrandMark />
               <span>ÍNDICE DRIVE</span>
-              <b>ARCHIVO OPERATIVO · 01</b>
+              <b>ARCHIVO UNIFICADO</b>
             </div>
             <span className="eyebrow">
               <span />
