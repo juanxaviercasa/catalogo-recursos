@@ -51,6 +51,7 @@ import {
   defaultDriveSource,
   driveSources,
   getDriveSource,
+  type DriveSource,
 } from "@/data/driveSources";
 import {
   describeResource,
@@ -546,13 +547,22 @@ export default function Home() {
     return resources.slice(start, start + itemsPerPage);
   }, [resources, itemsPerPage, currentPage, totalPages]);
 
-  const groupedResources = useMemo<[string, CatalogItem[]][]>(() => {
+  type FolderGroup = {
+    source: DriveSource;
+    chapterNumber: number;
+    title: string;
+    items: CatalogItem[];
+  };
+
+  const groupedResources = useMemo<FolderGroup[]>(() => {
     return driveSources
-      .map((source, index): [string, CatalogItem[]] => [
-        `Fuente ${String(index + 1).padStart(2, "0")} · ${source.account}`,
-        paginatedResources.filter(item => sourceFor(item).id === source.id),
-      ])
-      .filter(([, items]) => items.length > 0);
+      .map((source, index): FolderGroup => ({
+        source,
+        chapterNumber: index + 1,
+        title: `Fuente ${String(index + 1).padStart(2, "0")} · ${source.account}`,
+        items: paginatedResources.filter(item => sourceFor(item).id === source.id),
+      }))
+      .filter(group => group.items.length > 0);
   }, [paginatedResources]);
 
   const categoryCount = (category: Filter) =>
@@ -1326,15 +1336,15 @@ export default function Home() {
               <b>ESTADO · INDEXADO</b>
             </div>
             <div className="cover-source-list">
-              {driveSources.map(source => (
+              {driveSources.map((source, index) => (
                 <div className="cover-source-card" key={source.id}>
                   <span>
-                    <AtSign size={17} /> CUENTA DE ORIGEN
+                    <AtSign size={13} /> Fuente {String(index + 1).padStart(2, "0")}
                   </span>
                   <strong>{source.account}</strong>
                   <p>{source.indexedCount} recursos indexados.</p>
                   <a href={source.folderUrl} target="_blank" rel="noreferrer">
-                    Abrir carpeta exacta <ArrowUpRight size={15} />
+                    Abrir en Drive <ArrowUpRight size={13} />
                   </a>
                 </div>
               ))}
@@ -1541,9 +1551,9 @@ export default function Home() {
                     onChange={event => setSourceFilter(event.target.value)}
                   >
                     <option value="all">Todas las fuentes</option>
-                    {driveSources.map(source => (
+                    {driveSources.map((source, index) => (
                       <option key={source.id} value={source.id}>
-                        {source.account}
+                        Fuente {String(index + 1).padStart(2, "0")} · {source.account}
                       </option>
                     ))}
                   </select>
@@ -2186,25 +2196,43 @@ export default function Home() {
             </aside>
           )}
           <div className="records-by-folder">
-            {groupedResources.map(([group, items], groupIndex) => (
+            {groupedResources.map(group => (
               <section
                 className="folder-register"
-                key={group}
-                aria-label={group}
+                key={group.source.id}
+                aria-label={group.title}
               >
                 <header className="folder-register-heading">
-                  <span>
-                    CAPÍTULO {String(groupIndex + 1).padStart(2, "0")}{" "}
-                    <ChevronRight size={12} /> ORIGEN PRIVADO DE DRIVE
-                  </span>
-                  <h3>{group}</h3>
-                  <b>
-                    {items.length.toString().padStart(2, "0")}{" "}
-                    <small>registros</small>
-                  </b>
+                  <div className="folder-heading-info">
+                    <span className="folder-heading-kicker">
+                      CAPÍTULO {String(group.chapterNumber).padStart(2, "0")}{" "}
+                      <ChevronRight size={12} /> ORIGEN PRIVADO DE DRIVE
+                    </span>
+                    <h3 className="folder-heading-title">
+                      <span className="folder-title-badge">Fuente {String(group.chapterNumber).padStart(2, "0")}</span>
+                      <span className="folder-title-sep">·</span>
+                      <span className="folder-title-account">{group.source.account}</span>
+                    </h3>
+                    <p className="folder-heading-desc">{group.source.label}</p>
+                  </div>
+                  <div className="folder-heading-actions">
+                    <b className="folder-heading-count">
+                      {group.items.length.toString().padStart(2, "0")}{" "}
+                      <small>registros</small>
+                    </b>
+                    <a
+                      href={group.source.folderUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="folder-heading-link"
+                      title={`Abrir carpeta de ${group.source.account} en Drive`}
+                    >
+                      Abrir en Drive <ArrowUpRight size={14} />
+                    </a>
+                  </div>
                 </header>
                 <div className="resource-grid">
-                  {items.map((item, index) => (
+                  {group.items.map((item, index) => (
                     <ResourceCard
                       key={item.id}
                       item={item}
