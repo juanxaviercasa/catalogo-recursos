@@ -333,9 +333,45 @@ export default function Home() {
   const [showFavorites, setShowFavorites] = useState(false);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [comparisonOpen, setComparisonOpen] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(
-    () => typeof window === "undefined" || window.innerWidth >= 768
-  );
+  const [extraFiltersOpen, setExtraFiltersOpen] = useState(false);
+
+  const resetAllFilters = () => {
+    setFilter("Todo");
+    setShowFavorites(false);
+    setGoalFilter("Todo");
+    setTechnicalFilter("Todo");
+    setLicenseFilter("Todo");
+    setSizeFilter("Todo");
+    setActiveTag(null);
+    setSourceFilter("all");
+    setMinSize("");
+    setMaxSize("");
+  };
+
+  const activeFiltersCount = useMemo(() => {
+    return [
+      filter !== "Todo",
+      showFavorites,
+      goalFilter !== "Todo",
+      technicalFilter !== "Todo",
+      licenseFilter !== "Todo",
+      sizeFilter !== "Todo",
+      Boolean(activeTag),
+      sourceFilter !== "all",
+      Boolean(minSize || maxSize),
+    ].filter(Boolean).length;
+  }, [
+    filter,
+    showFavorites,
+    goalFilter,
+    technicalFilter,
+    licenseFilter,
+    sizeFilter,
+    activeTag,
+    sourceFilter,
+    minSize,
+    maxSize,
+  ]);
   const [collections, setCollections] = useState<SavedCollection[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -1603,360 +1639,405 @@ export default function Home() {
             </section>
           )}
 
-          <button
-            className="filters-toggle"
-            onClick={() => setFiltersOpen(!filtersOpen)}
-            aria-expanded={filtersOpen}
-            aria-controls="catalog-filters"
-          >
-            {filtersOpen ? (
-              <PanelTopClose size={16} />
-            ) : (
-              <PanelTopOpen size={16} />
-            )}
-            <span>{filtersOpen ? "Ocultar filtros" : "Mostrar filtros"}</span>
-            <b>
-              {
-                [
-                  filter !== "Todo",
-                  goalFilter !== "Todo",
-                  technicalFilter !== "Todo",
-                  licenseFilter !== "Todo",
-                  sizeFilter !== "Todo",
-                  Boolean(activeTag),
-                ].filter(Boolean).length
-              }{" "}
-              activos
-            </b>
-            <ChevronDown
-              size={16}
-              className={
-                filtersOpen
-                  ? "filters-toggle-chevron filters-toggle-chevron--open"
-                  : "filters-toggle-chevron"
-              }
-            />
-          </button>
-          {filtersOpen && (
-            <div id="catalog-filters" className="filters-panel">
-              <div className="market-filters" aria-label="Filtros de categoría">
+          {/* BARRA MODULAR DE FILTROS (Estilo Envato Elements / Freepik) */}
+          <section className="modular-filter-bar" aria-label="Filtros del catálogo">
+            {/* Nivel 1: Carrusel / Navegación horizontal de Categorías de 1 clic */}
+            <div className="modular-categories" role="tablist" aria-label="Categorías principales">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={filter === "Todo" && !showFavorites}
+                className={`modular-category-chip ${filter === "Todo" && !showFavorites ? "modular-category-chip--active" : ""}`}
+                onClick={() => {
+                  setFilter("Todo");
+                  setShowFavorites(false);
+                }}
+              >
+                <span className="modular-category-symbol">✦</span>
+                <span className="modular-category-name">Todo el catálogo</span>
+                <span className="modular-category-badge">{fullCatalog.length}</span>
+              </button>
+              {catalogCategories.map(category => {
+                const visual = categoryVisual[category];
+                const Icon = visual.icon;
+                const count = categoryCount(category);
+                const isActive = filter === category && !showFavorites;
+                return (
+                  <button
+                    key={category}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    className={`modular-category-chip ${isActive ? "modular-category-chip--active" : ""}`}
+                    onClick={() => {
+                      setFilter(category);
+                      setShowFavorites(false);
+                    }}
+                  >
+                    <Icon size={14} className="modular-category-icon" />
+                    <span className="modular-category-name">{category}</span>
+                    <span className="modular-category-badge">{count}</span>
+                  </button>
+                );
+              })}
+              {favorites.length > 0 && (
                 <button
-                  className={`category-card category-card--all ${filter === "Todo" && !showFavorites ? "category-card--active" : ""}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={showFavorites}
+                  className={`modular-category-chip ${showFavorites ? "modular-category-chip--active" : ""}`}
                   onClick={() => {
-                    setFilter("Todo");
-                    setShowFavorites(false);
+                    setShowFavorites(!showFavorites);
+                    if (!showFavorites) setFilter("Todo");
                   }}
                 >
-                  <span className="category-symbol">✦</span>
-                  <span>
-                    <b>Todo el índice</b>
-                    <small>{fullCatalog.length} recursos</small>
-                  </span>
-                  <ChevronRight size={17} />
+                  <Heart size={13} className="modular-category-icon" fill={showFavorites ? "currentColor" : "none"} />
+                  <span className="modular-category-name">Guardados</span>
+                  <span className="modular-category-badge">{favorites.length}</span>
                 </button>
-                {catalogCategories.map(category => {
-                  const visual = categoryVisual[category];
-                  const Icon = visual.icon;
-                  return (
-                    <button
-                      key={category}
-                      className={`category-card category-card--${visual.tone} ${filter === category && !showFavorites ? "category-card--active" : ""}`}
-                      onClick={() => {
-                        setFilter(category);
-                        setShowFavorites(false);
-                      }}
-                    >
-                      <Icon size={20} />
-                      <span>
-                        <b>{category}</b>
-                        <small>{categoryCount(category)} recursos</small>
-                      </span>
-                      <ChevronRight size={17} />
-                    </button>
-                  );
-                })}
+              )}
+            </div>
+
+            {/* Nivel 2: Fila de Selectores Modulares Desplegables (Dropdowns de Filtro) */}
+            <div className="modular-dropdowns-row">
+              {/* Dropdown: Fuente de Drive */}
+              <div className={`modular-select-box ${sourceFilter !== "all" ? "modular-select-box--active" : ""}`}>
+                <span className="modular-select-icon">📁</span>
+                <select
+                  id="filter-source"
+                  className="modular-select"
+                  value={sourceFilter}
+                  onChange={e => setSourceFilter(e.target.value)}
+                  aria-label="Filtrar por fuente de Drive"
+                >
+                  <option value="all">Todas las fuentes ({driveSources.length})</option>
+                  {driveSources.map((source, index) => (
+                    <option key={source.id} value={source.id}>
+                      Fuente {String(index + 1).padStart(2, "0")} · {source.account}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown size={14} className="modular-select-chevron" />
               </div>
-              <div className="project-goal-rail">
-                <div>
-                  <span>Empezar por un objetivo</span>
-                  <p>¿Qué quieres resolver en este proyecto?</p>
-                </div>
-                <div>
+
+              {/* Dropdown: Software / Formato */}
+              <div className={`modular-select-box ${technicalFilter !== "Todo" ? "modular-select-box--active" : ""}`}>
+                <span className="modular-select-icon">⚙️</span>
+                <select
+                  id="filter-tech"
+                  className="modular-select"
+                  value={technicalFilter}
+                  onChange={e => setTechnicalFilter(e.target.value as TechnicalFilter)}
+                  aria-label="Filtrar por software o compatibilidad"
+                >
+                  <option value="Todo">Todas las compatibilidades</option>
+                  {technicalFilters.map(item => {
+                    const count = fullCatalog.filter(r => matchesTechnicalFilter(r, item.id)).length;
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {item.label} ({count})
+                      </option>
+                    );
+                  })}
+                </select>
+                <ChevronDown size={14} className="modular-select-chevron" />
+              </div>
+
+              {/* Dropdown: Tamaño */}
+              <div className={`modular-select-box ${sizeFilter !== "Todo" || exactSizeActive ? "modular-select-box--active" : ""}`}>
+                <span className="modular-select-icon">📦</span>
+                <select
+                  id="filter-size"
+                  className="modular-select"
+                  value={sizeFilter}
+                  onChange={e => setSizeFilter(e.target.value as SizeFilter)}
+                  aria-label="Filtrar por tamaño de archivo"
+                >
+                  <option value="Todo">Cualquier tamaño</option>
+                  {sizeFilters.map(item => {
+                    const count = fullCatalog.filter(r => matchesSizeFilter(r, item.id)).length;
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {item.label} · {item.note} ({count})
+                      </option>
+                    );
+                  })}
+                </select>
+                <ChevronDown size={14} className="modular-select-chevron" />
+              </div>
+
+              {/* Dropdown: Licencia */}
+              <div className={`modular-select-box ${licenseFilter !== "Todo" ? "modular-select-box--active" : ""}`}>
+                <span className="modular-select-icon">⚖️</span>
+                <select
+                  id="filter-license"
+                  className="modular-select"
+                  value={licenseFilter}
+                  onChange={e => setLicenseFilter(e.target.value as LicenseFilter)}
+                  aria-label="Filtrar por estado de licencia"
+                >
+                  <option value="Todo">Todas las licencias</option>
+                  {licenseReviewFilters.map(item => {
+                    const count = fullCatalog.filter(r => matchesLicenseReview(r, item.id)).length;
+                    return (
+                      <option key={item.id} value={item.id}>
+                        {item.label} ({count})
+                      </option>
+                    );
+                  })}
+                </select>
+                <ChevronDown size={14} className="modular-select-chevron" />
+              </div>
+
+              {/* Dropdown: Objetivo */}
+              <div className={`modular-select-box ${goalFilter !== "Todo" ? "modular-select-box--active" : ""}`}>
+                <span className="modular-select-icon">🎯</span>
+                <select
+                  id="filter-goal"
+                  className="modular-select"
+                  value={goalFilter}
+                  onChange={e => setGoalFilter(e.target.value as GoalFilter)}
+                  aria-label="Filtrar por objetivo de proyecto"
+                >
+                  <option value="Todo">Cualquier objetivo</option>
                   {projectGoals.map(goal => (
-                    <button
-                      key={goal.id}
-                      title={goal.description}
-                      onClick={() =>
-                        setGoalFilter(goalFilter === goal.id ? "Todo" : goal.id)
-                      }
-                      className={
-                        goalFilter === goal.id
-                          ? "goal-pill goal-pill--active"
-                          : "goal-pill"
-                      }
-                    >
+                    <option key={goal.id} value={goal.id}>
                       {goal.label}
-                    </button>
+                    </option>
                   ))}
-                </div>
-                {goalFilter !== "Todo" && (
-                  <button
-                    className="clear-goal"
-                    onClick={() => setGoalFilter("Todo")}
-                  >
-                    Quitar objetivo
-                  </button>
-                )}
+                </select>
+                <ChevronDown size={14} className="modular-select-chevron" />
               </div>
-              <div className="technical-rail technical-rail--quick">
-                <div>
-                  <span>Filtros técnicos rápidos</span>
-                  <p>Accede a las plataformas más usadas en esta biblioteca.</p>
-                </div>
-                <div>
-                  {quickTechnicalFilters.map(item => (
-                    <button
-                      key={item.id}
-                      title={tooltipsEnabled ? item.note : undefined}
-                      onClick={() =>
-                        setTechnicalFilter(
-                          technicalFilter === item.id ? "Todo" : item.id
-                        )
-                      }
-                      className={
-                        technicalFilter === item.id
-                          ? "technical-pill technical-pill--active"
-                          : "technical-pill"
-                      }
-                    >
-                      {item.label}
-                      <b>
-                        {
-                          fullCatalog.filter(resource =>
-                            matchesTechnicalFilter(resource, item.id)
-                          ).length
-                        }
-                      </b>
-                    </button>
-                  ))}
-                </div>
-                {technicalFilter !== "Todo" && (
-                  <button
-                    className="clear-tech"
-                    onClick={() => setTechnicalFilter("Todo")}
-                  >
-                    Quitar compatibilidad
-                  </button>
-                )}
-              </div>
-              <div className="technical-rail">
-                <div>
-                  <span>Todas las compatibilidades</span>
-                  <p>Filtra también por CMS, edición, diseño y audio.</p>
-                </div>
-                <div>
-                  {technicalFilters.map(item => (
-                    <button
-                      key={item.id}
-                      title={tooltipsEnabled ? item.note : undefined}
-                      onClick={() =>
-                        setTechnicalFilter(
-                          technicalFilter === item.id ? "Todo" : item.id
-                        )
-                      }
-                      className={
-                        technicalFilter === item.id
-                          ? "technical-pill technical-pill--active"
-                          : "technical-pill"
-                      }
-                    >
-                      {item.label}
-                      <b>
-                        {
-                          fullCatalog.filter(resource =>
-                            matchesTechnicalFilter(resource, item.id)
-                          ).length
-                        }
-                      </b>
-                    </button>
-                  ))}
-                </div>
-                {technicalFilter !== "Todo" && (
-                  <button
-                    className="clear-tech"
-                    onClick={() => setTechnicalFilter("Todo")}
-                  >
-                    Quitar compatibilidad
-                  </button>
-                )}
-              </div>
-              <div className="license-rail">
-                <div>
-                  <span>Licencia y uso</span>
-                  <p>
-                    El índice orienta qué revisar; no confirma permisos de
-                    licencia ni uso comercial.
-                  </p>
-                </div>
-                <div>
-                  {licenseReviewFilters.map(item => (
-                    <button
-                      key={item.id}
-                      title={tooltipsEnabled ? item.note : undefined}
-                      onClick={() =>
-                        setLicenseFilter(
-                          licenseFilter === item.id ? "Todo" : item.id
-                        )
-                      }
-                      className={
-                        licenseFilter === item.id
-                          ? "license-pill license-pill--active"
-                          : "license-pill"
-                      }
-                    >
-                      {item.label}
-                      <b>
-                        {
-                          fullCatalog.filter(resource =>
-                            matchesLicenseReview(resource, item.id)
-                          ).length
-                        }
-                      </b>
-                    </button>
-                  ))}
-                </div>
-                {licenseFilter !== "Todo" && (
-                  <button
-                    className="clear-license"
-                    onClick={() => setLicenseFilter("Todo")}
-                  >
-                    Quitar licencia
-                  </button>
-                )}
-              </div>
-              <div className="license-import" aria-label="Importar estados de licencia">
-                <input
-                  ref={licenseCsvInputRef}
-                  type="file"
-                  accept=".csv,text/csv"
-                  onChange={importLicenseCsv}
-                  hidden
+
+              {/* Botón: Más opciones */}
+              <button
+                type="button"
+                className={`modular-extra-toggle ${extraFiltersOpen ? "modular-extra-toggle--open" : ""}`}
+                onClick={() => setExtraFiltersOpen(!extraFiltersOpen)}
+                aria-expanded={extraFiltersOpen}
+                title="Opciones avanzadas: etiquetas frecuentes, rango en MB y licencias CSV"
+              >
+                <SlidersHorizontal size={14} />
+                <span>Más opciones</span>
+                <ChevronDown
+                  size={13}
+                  style={{
+                    transform: extraFiltersOpen ? "rotate(180deg)" : "none",
+                    transition: "transform 0.2s ease"
+                  }}
                 />
-                <div>
-                  <span>LICENCIAS MASIVAS</span>
-                  <b>Importa decisiones desde CSV</b>
-                  <small>Columnas requeridas: <code>ID</code> y <code>Estado</code>.</small>
+              </button>
+            </div>
+
+            {/* Panel Desplegable: Más opciones */}
+            {extraFiltersOpen && (
+              <div className="modular-extra-panel">
+                <div className="modular-extra-section">
+                  <span className="modular-extra-title">🏷️ Etiquetas frecuentes:</span>
+                  <div className="modular-tags-wrap">
+                    {popularTags.slice(0, 16).map(tag => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+                        className={`modular-tag-chip ${activeTag === tag ? "modular-tag-chip--active" : ""}`}
+                      >
+                        #{tag}
+                      </button>
+                    ))}
+                    {activeTag && (
+                      <button
+                        type="button"
+                        className="modular-tag-clear"
+                        onClick={() => setActiveTag(null)}
+                      >
+                        Quitar etiqueta
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <button onClick={() => licenseCsvInputRef.current?.click()}>
-                  <FileArchive size={15} /> Importar CSV
-                </button>
-                {lastLicenseImport && (
-                  <em>{lastLicenseImport.applied} filas aplicadas · {lastLicenseImport.rejected} rechazadas</em>
-                )}
+
+                <div className="modular-extra-bottom-row">
+                  <div className="modular-extra-section modular-extra-section--range">
+                    <span className="modular-extra-title">📏 Rango exacto (MB):</span>
+                    <div className="modular-range-inputs">
+                      <input
+                        type="number"
+                        min="0"
+                        value={minSize}
+                        onChange={e => setMinSize(e.target.value)}
+                        placeholder="Mín MB"
+                        aria-label="Tamaño mínimo en megabytes"
+                      />
+                      <span>–</span>
+                      <input
+                        type="number"
+                        min="0"
+                        value={maxSize}
+                        onChange={e => setMaxSize(e.target.value)}
+                        placeholder="Máx MB"
+                        aria-label="Tamaño máximo en megabytes"
+                      />
+                      {exactSizeActive && (
+                        <button
+                          type="button"
+                          onClick={() => { setMinSize(""); setMaxSize(""); }}
+                          className="modular-range-clear"
+                          title="Limpiar rango exacto"
+                        >
+                          <X size={13} /> Limpiar
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="modular-extra-section modular-extra-section--csv">
+                    <span className="modular-extra-title">📄 Licencias masivas:</span>
+                    <div className="modular-csv-wrap">
+                      <input
+                        ref={licenseCsvInputRef}
+                        type="file"
+                        accept=".csv,text/csv"
+                        onChange={importLicenseCsv}
+                        hidden
+                      />
+                      <button
+                        type="button"
+                        className="modular-csv-btn"
+                        onClick={() => licenseCsvInputRef.current?.click()}
+                      >
+                        <FileArchive size={14} /> Importar decisiones CSV
+                      </button>
+                      {lastLicenseImport && (
+                        <small className="modular-csv-result">
+                          {lastLicenseImport.applied} aplicadas · {lastLicenseImport.rejected} rechazadas
+                        </small>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="size-rail">
-                <div>
-                  <span>Tamaño de archivo</span>
-                  <p>Elige según tu conexión y espacio disponible.</p>
-                </div>
-                <div>
-                  {sizeFilters.map(item => (
+            )}
+
+            {/* Nivel 3: Chips de Filtros Activos con 1-clic para remover */}
+            {activeFiltersCount > 0 && (
+              <div className="modular-active-bar" aria-label="Filtros aplicados">
+                <span className="modular-active-title">
+                  Filtros activos (<b>{activeFiltersCount}</b>):
+                </span>
+                <div className="modular-active-chips">
+                  {filter !== "Todo" && (
                     <button
-                      key={item.id}
-                      title={item.note}
-                      onClick={() =>
-                        setSizeFilter(sizeFilter === item.id ? "Todo" : item.id)
-                      }
-                      className={
-                        sizeFilter === item.id
-                          ? "size-pill size-pill--active"
-                          : "size-pill"
-                      }
+                      type="button"
+                      className="modular-active-chip"
+                      onClick={() => setFilter("Todo")}
+                      title="Quitar filtro de categoría"
                     >
-                      {item.label}
-                      <b>
-                        {
-                          fullCatalog.filter(resource =>
-                            matchesSizeFilter(resource, item.id)
-                          ).length
-                        }
-                      </b>
-                    </button>
-                  ))}
-                </div>
-                <div className="exact-size-range">
-                  <span>Rango exacto · MB</span>
-                  <label>
-                    <span>Mínimo</span>
-                    <input
-                      type="number"
-                      min="0"
-                      inputMode="decimal"
-                      value={minSize}
-                      onChange={event => setMinSize(event.target.value)}
-                      placeholder="0"
-                      aria-label="Tamaño mínimo en megabytes"
-                    />
-                  </label>
-                  <label>
-                    <span>Máximo</span>
-                    <input
-                      type="number"
-                      min="0"
-                      inputMode="decimal"
-                      value={maxSize}
-                      onChange={event => setMaxSize(event.target.value)}
-                      placeholder="Sin límite"
-                      aria-label="Tamaño máximo en megabytes"
-                    />
-                  </label>
-                  {exactSizeActive && (
-                    <button
-                      onClick={() => {
-                        setMinSize("");
-                        setMaxSize("");
-                      }}
-                      aria-label="Quitar rango exacto de tamaño"
-                    >
-                      <X size={14} />
+                      <span>Categoría: <b>{filter}</b></span>
+                      <X size={12} />
                     </button>
                   )}
+                  {showFavorites && (
+                    <button
+                      type="button"
+                      className="modular-active-chip"
+                      onClick={() => setShowFavorites(false)}
+                      title="Mostrar todos los recursos"
+                    >
+                      <span>Solo guardados</span>
+                      <X size={12} />
+                    </button>
+                  )}
+                  {sourceFilter !== "all" && (
+                    <button
+                      type="button"
+                      className="modular-active-chip"
+                      onClick={() => setSourceFilter("all")}
+                      title="Ver todas las fuentes"
+                    >
+                      <span>Fuente: <b>{driveSources.find(s => s.id === sourceFilter)?.account || sourceFilter}</b></span>
+                      <X size={12} />
+                    </button>
+                  )}
+                  {technicalFilter !== "Todo" && (
+                    <button
+                      type="button"
+                      className="modular-active-chip"
+                      onClick={() => setTechnicalFilter("Todo")}
+                      title="Quitar filtro de software"
+                    >
+                      <span>Software: <b>{technicalFilters.find(t => t.id === technicalFilter)?.label || technicalFilter}</b></span>
+                      <X size={12} />
+                    </button>
+                  )}
+                  {sizeFilter !== "Todo" && (
+                    <button
+                      type="button"
+                      className="modular-active-chip"
+                      onClick={() => setSizeFilter("Todo")}
+                      title="Quitar filtro de tamaño"
+                    >
+                      <span>Tamaño: <b>{sizeFilters.find(s => s.id === sizeFilter)?.label || sizeFilter}</b></span>
+                      <X size={12} />
+                    </button>
+                  )}
+                  {exactSizeActive && (
+                    <button
+                      type="button"
+                      className="modular-active-chip"
+                      onClick={() => { setMinSize(""); setMaxSize(""); }}
+                      title="Quitar rango exacto"
+                    >
+                      <span>Rango: <b>{minSize || "0"} - {maxSize || "∞"} MB</b></span>
+                      <X size={12} />
+                    </button>
+                  )}
+                  {licenseFilter !== "Todo" && (
+                    <button
+                      type="button"
+                      className="modular-active-chip"
+                      onClick={() => setLicenseFilter("Todo")}
+                      title="Quitar filtro de licencia"
+                    >
+                      <span>Licencia: <b>{licenseReviewFilters.find(l => l.id === licenseFilter)?.label || licenseFilter}</b></span>
+                      <X size={12} />
+                    </button>
+                  )}
+                  {goalFilter !== "Todo" && (
+                    <button
+                      type="button"
+                      className="modular-active-chip"
+                      onClick={() => setGoalFilter("Todo")}
+                      title="Quitar filtro de objetivo"
+                    >
+                      <span>Objetivo: <b>{projectGoals.find(g => g.id === goalFilter)?.label || goalFilter}</b></span>
+                      <X size={12} />
+                    </button>
+                  )}
+                  {activeTag && (
+                    <button
+                      type="button"
+                      className="modular-active-chip"
+                      onClick={() => setActiveTag(null)}
+                      title="Quitar etiqueta"
+                    >
+                      <span>Etiqueta: <b>#{activeTag}</b></span>
+                      <X size={12} />
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="modular-reset-all-btn"
+                    onClick={resetAllFilters}
+                    title="Restablecer todos los filtros"
+                  >
+                    <RotateCcw size={12} />
+                    Limpiar todos
+                  </button>
                 </div>
-                {sizeFilter !== "Todo" && (
-                  <button
-                    className="clear-size"
-                    onClick={() => setSizeFilter("Todo")}
-                  >
-                    Quitar tamaño
-                  </button>
-                )}
               </div>
-              <div className="tag-rail">
-                <span>Etiquetas frecuentes</span>
-                {popularTags.map(tag => (
-                  <button
-                    key={tag}
-                    onClick={() => setActiveTag(activeTag === tag ? null : tag)}
-                    className={
-                      activeTag === tag
-                        ? "tag-pill tag-pill--active"
-                        : "tag-pill"
-                    }
-                  >
-                    #{tag}
-                  </button>
-                ))}
-                {activeTag && (
-                  <button
-                    className="clear-tag"
-                    onClick={() => setActiveTag(null)}
-                  >
-                    Quitar etiqueta
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
+            )}
+          </section>
 
           <div className="resource-toolbar">
             <div className="resource-toolbar-copy">
@@ -2264,13 +2345,8 @@ export default function Home() {
               </p>
               <button
                 onClick={() => {
-                  resetSearchCriteria();
-                  setActiveTag(null);
-                  setFilter("Todo");
-                  setGoalFilter("Todo");
-                  setTechnicalFilter("Todo");
-                  setSizeFilter("Todo");
-                  setShowFavorites(false);
+                  resetAllFilters();
+                  setQuery("");
                 }}
               >
                 Ver todo el catálogo
